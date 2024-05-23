@@ -4098,6 +4098,67 @@ namespace CG_OpenCV
             saturation = (max == 0) ? 0 : 1d - (1d * min / max);
             value = max / 255d;
         }
+        public static void Binarization(Image<Bgr, byte> img)
+        {
+            unsafe
+            {
+                // direct access to the image memory(sequencial)
+                // direcion top left -> bottom right
+                // aceder diretamente à memória
+
+
+                MIplImage m = img.MIplImage;
+                byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
+                byte blue, green, red;
+                /*
+                 * MIplImage contém vários params que descrevem como está organizada a imagem
+                width largura da imagem
+                widthStep indica qual a largura de total de uma linha (bytes)
+                nChannels indica o número de canais de cor (RGB = 3)
+                trabalhar com a estrutura dataptr for necessário avançar ou recuar uma linha
+                usar o widthStep
+                avançar uma linha de pixeis completa dataPtr += m.widthStep
+                avançar numero de pixeis de alinhamento para passar a linha seguinte
+                int padding = m.widthStep - m.nChannels * m.width;
+                dataPtr += padding;
+                */
+                int width = img.Width;
+                int height = img.Height;
+                int nChan = m.nChannels; // number of channels - 3
+                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+                int x, y;
+                int step = m.widthStep;
+                if (nChan == 3) // image in RGB RedGreenBlue
+                {
+                    for (y = 0; y < height; y++)
+                    {
+                        for (x = 0; x < width; x++)
+                        {
+                            //retrive 3 colour components
+                            blue = (dataPtr + x * nChan + y * step)[0];
+                            green = (dataPtr + x * nChan + y * step)[1];
+                            red = (dataPtr + x * nChan + y * step)[2];
+
+                            Color original = Color.FromArgb(dataPtr[2], dataPtr[1], dataPtr[0]);
+                            ColorToHSV(original, out var hue, out var saturation, out var value);
+                            if (150 < hue && hue < 240)
+                            {
+                                (dataPtr + x * nChan + y * step)[0] = 255;
+                                (dataPtr + x * nChan + y * step)[1] = 255;
+                                (dataPtr + x * nChan + y * step)[2] = 255;
+                            }
+                            else {
+                                (dataPtr + x * nChan + y * step)[0] = 0;
+                                (dataPtr + x * nChan + y * step)[1] = 0;
+                                (dataPtr + x * nChan + y * step)[2] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
 
     }
 }
