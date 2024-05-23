@@ -7,6 +7,7 @@ using ZedGraph;
 using System.Diagnostics.Contracts;
 using static Emgu.CV.StereoSGBM;
 using System.Linq;
+using System.Drawing;
 
 namespace CG_OpenCV
 {
@@ -4088,6 +4089,14 @@ namespace CG_OpenCV
 
 
             }
+        }
+        public static void ColorToHSV(Color color, out double hue, out double saturation, out double value)
+        {
+            int max = Math.Max(color.R, Math.Max(color.G, color.B));
+            int min = Math.Min(color.R, Math.Min(color.G, color.B));
+            hue = color.GetHue();
+            saturation = (max == 0) ? 0 : 1d - (1d * min / max);
+            value = max / 255d;
         }
 
     }
