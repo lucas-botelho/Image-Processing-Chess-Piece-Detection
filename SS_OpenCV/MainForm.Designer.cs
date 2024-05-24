@@ -50,8 +50,12 @@
             this.autoZoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.evalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.calcularHistogramasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.ImageViewer = new System.Windows.Forms.PictureBox();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.binarizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -70,7 +74,8 @@
             this.editToolStripMenuItem,
             this.imageToolStripMenuItem,
             this.autoresToolStripMenuItem,
-            this.evalToolStripMenuItem});
+            this.evalToolStripMenuItem,
+            this.helpersToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(962, 28);
@@ -220,9 +225,25 @@
             this.evalToolStripMenuItem.Text = "Eval";
             this.evalToolStripMenuItem.Click += new System.EventHandler(this.evalToolStripMenuItem_Click);
             // 
+            // helpersToolStripMenuItem
+            // 
+            this.helpersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.calcularHistogramasToolStripMenuItem});
+            this.helpersToolStripMenuItem.Name = "helpersToolStripMenuItem";
+            this.helpersToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
+            this.helpersToolStripMenuItem.Text = "Helpers";
+            // 
+            // calcularHistogramasToolStripMenuItem
+            // 
+            this.calcularHistogramasToolStripMenuItem.Name = "calcularHistogramasToolStripMenuItem";
+            this.calcularHistogramasToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.calcularHistogramasToolStripMenuItem.Text = "CalcularHistogramas";
+            this.calcularHistogramasToolStripMenuItem.Click += new System.EventHandler(this.calcularHistogramasToolStripMenuItem_Click);
+            // 
             // panel1
             // 
             this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.ImageViewer);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 28);
@@ -230,6 +251,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(962, 514);
             this.panel1.TabIndex = 6;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(594, 15);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 7;
+            this.button1.Text = "...";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // ImageViewer
             // 
@@ -296,6 +327,10 @@
         private System.Windows.Forms.ToolStripMenuItem evalToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem grayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem binarizationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem calcularHistogramasToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }
 

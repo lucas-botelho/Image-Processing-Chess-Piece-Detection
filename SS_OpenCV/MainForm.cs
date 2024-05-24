@@ -1,15 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
+using CG_OpenCV.Models;
+using CG_OpenCV.Services;
 using Emgu.CV;
 using Emgu.CV.Structure;
 
 namespace CG_OpenCV
-{ 
+{
     public partial class MainForm : Form
     {
         Image<Bgr, Byte> img = null; // working image
         Image<Bgr, Byte> imgUndo = null; // undo backup image - UNDO
         string title_bak = "";
+        List<PieceHistogram> PieceHistograms { get; set; }
+
 
         public MainForm()
         {
@@ -67,7 +74,7 @@ namespace CG_OpenCV
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (imgUndo == null) // verify if the image is already opened
-                return; 
+                return;
             Cursor = Cursors.WaitCursor;
             img = imgUndo.Copy();
 
@@ -163,6 +170,10 @@ namespace CG_OpenCV
             Cursor = Cursors.Default; // normal cursor 
         }
 
+        private void calcularHistogramasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
         private void binarizationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (img == null) // verify if the image is already opened
@@ -179,9 +190,18 @@ namespace CG_OpenCV
 
             Cursor = Cursors.Default; // normal cursor 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string relativePath = Path.Combine("..", "..", "BD Chess");
+            string absolutePath = Path.GetFullPath(relativePath);
+
+            string[] pecas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
+
+            var hisCalculator = new HistrogramCalculator(pecas);
+
+            this.PieceHistograms = hisCalculator.Calculate();
+
+        }
     }
-
-
-
-
 }
