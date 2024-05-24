@@ -4128,8 +4128,11 @@ namespace CG_OpenCV
                 int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
                 int x, y;
                 int step = m.widthStep;
+                int[] histogramX = new int[width]; //holds the percentage of 255 on that X column
+                int[] histogramY = new int[height]; //holds the percentage of 255 of that Y line
                 if (nChan == 3) // image in RGB RedGreenBlue
                 {
+                    
                     for (y = 0; y < height; y++)
                     {
                         for (x = 0; x < width; x++)
@@ -4139,10 +4142,12 @@ namespace CG_OpenCV
                             green = (dataPtr + x * nChan + y * step)[1];
                             red = (dataPtr + x * nChan + y * step)[2];
 
-                            Color original = Color.FromArgb(dataPtr[2], dataPtr[1], dataPtr[0]);
+                            Color original = Color.FromArgb(red, green, blue);
                             ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (150 < hue && hue < 240)
+                            if (70 < hue && hue < 320)
                             {
+                                histogramY[y] = histogramY[y] + 1;
+                                histogramX[x] = histogramX[x] + 1;
                                 (dataPtr + x * nChan + y * step)[0] = 255;
                                 (dataPtr + x * nChan + y * step)[1] = 255;
                                 (dataPtr + x * nChan + y * step)[2] = 255;
@@ -4154,6 +4159,42 @@ namespace CG_OpenCV
                             }
                         }
                     }
+                    int thresholdPertenceTabuleiro = 2;
+                    //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
+                    // Initialize min and max values for X and Y
+                    int minX = -1, maxX = -1, minY = -1, maxY = -1;
+
+                    // Process histogramX and find min and max X where histogramX[x] > 20
+                    for (x = 0; x < width; x++)
+                    {
+                        histogramX[x] = (histogramX[x] / height) * 100;
+                        if (histogramX[x] > thresholdPertenceTabuleiro)
+                        {
+                            if (minX == -1)
+                            {
+                                minX = x;
+                            }
+                            maxX = x;
+                        }
+                    }
+
+                    // Process histogramY and find min and max Y where histogramY[y] > 20
+                    for (y = 0; y < height; y++)
+                    {
+                        histogramY[y] = (histogramY[y] / width) * 100;
+                        if (histogramY[y] > thresholdPertenceTabuleiro)
+                        {
+                            if (minY == -1)
+                            {
+                                minY = y;
+                            }
+                            maxY = y;
+                        }
+                    }
+                    // Output the results
+                    Console.WriteLine($"Min X: {minX}, Max X: {maxX}");
+                    Console.WriteLine($"Min Y: {minY}, Max Y: {maxY}");
+
                 }
             }
         }
