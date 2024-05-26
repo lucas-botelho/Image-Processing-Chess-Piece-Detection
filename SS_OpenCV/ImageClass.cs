@@ -4148,14 +4148,14 @@ namespace CG_OpenCV
                             {
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;
-                                (dataPtr + x * nChan + y * step)[0] = 255;
-                                (dataPtr + x * nChan + y * step)[1] = 255;
-                                (dataPtr + x * nChan + y * step)[2] = 255;
-                            }
-                            else {
                                 (dataPtr + x * nChan + y * step)[0] = 0;
                                 (dataPtr + x * nChan + y * step)[1] = 0;
                                 (dataPtr + x * nChan + y * step)[2] = 0;
+                            }
+                            else {
+                                (dataPtr + x * nChan + y * step)[0] = 255;
+                                (dataPtr + x * nChan + y * step)[1] = 255;
+                                (dataPtr + x * nChan + y * step)[2] = 255;
                             }
                         }
                     }
