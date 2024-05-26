@@ -9,6 +9,6 @@ namespace CG_OpenCV.Models
     internal class PieceHistogram
     {
         public string Name { get; set; }
-        public int[,] HistogramValueRGB { get; set; }
+        public int[] HistogramValues { get; set; }
     }
 }

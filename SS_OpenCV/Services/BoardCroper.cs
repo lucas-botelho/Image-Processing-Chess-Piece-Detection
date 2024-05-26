@@ -10,6 +10,7 @@ using System.Drawing;
 using Emgu.CV.Structure;
 using Emgu.CV;
 using CG_OpenCV.Models;
+using System.Collections.Generic;
 
 namespace CG_OpenCV.Services
 {
@@ -25,8 +26,6 @@ namespace CG_OpenCV.Services
 
         public Image<Bgr, Byte> CropBoard()
         {
-            var imgCopy = this.imgCopy.Copy();
-
             var coords = this.FindBoardCoords();
 
             int width = Math.Abs(coords[0].X - coords[1].X);
@@ -38,9 +37,10 @@ namespace CG_OpenCV.Services
             string absolutePath = Path.GetFullPath(relativePath);
             croppedImg.Bitmap.Save(absolutePath, ImageFormat.Png);
 
-            return imgCopy;
+            return croppedImg;
         }
 
+        //trocamos o range do hue para comecar a 150, a 70 apanhava o verde
         public void ColorToHSV(Color color, out double hue, out double saturation, out double value)
         {
             int max = Math.Max(color.R, Math.Max(color.G, color.B));
@@ -137,6 +137,34 @@ namespace CG_OpenCV.Services
                 new Coord(minX,maxY),
                 new Coord(maxX,minY),
             };
+        }
+
+
+        public IEnumerable<Image<Bgr, Byte>> CropIndividualPieces(Image<Bgr, Byte> croppedBoard)
+        {
+            var width = croppedBoard.MIplImage.width;
+            var height = croppedBoard.MIplImage.height;
+            var pieces = new List<Image<Bgr, Byte>>();
+            var pieceWidth = width / 8;
+            var pieceHeight = height / 8;
+
+            for (int y = 0; y < height; y += pieceHeight)
+            {
+                for (int x = 0; x < width; x += pieceWidth)
+                {
+                    if (x + pieceWidth > width) break;
+                    var imagemCortadinha = croppedBoard.GetSubRect(new Rectangle(x, y, pieceWidth, pieceHeight));
+                    pieces.Add(imagemCortadinha);
+
+                    string relativePath = Path.Combine("..", "..", $"ImagensCortadinhas/x{x}y{y}.png");
+                    string absolutePath = Path.GetFullPath(relativePath);
+                    imagemCortadinha.Bitmap.Save(absolutePath, ImageFormat.Png);
+                }
+
+                if (y + pieceHeight > height) break;
+            }
+
+            return pieces;
         }
     }
 }

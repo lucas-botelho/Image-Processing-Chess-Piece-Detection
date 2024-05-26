@@ -190,7 +190,7 @@ namespace CG_OpenCV
             //copy Undo Image
             imgUndo = img.Copy();
 
-            ImageClass.Binarization(img);
+            ImageClass.ConvertToBW_Otsu(img);
 
             ImageViewer.Image = img.Bitmap;
             ImageViewer.Refresh(); // refresh image on the screen
@@ -202,7 +202,12 @@ namespace CG_OpenCV
         {
             var bcroper = new BoardCroper(img);
 
-            bcroper.CropBoard();
+            var croppedBoard = bcroper.CropBoard();
+
+            var imagensCortadinhas = bcroper.CropIndividualPieces(croppedBoard);
+
+
+
         }
     }
 }

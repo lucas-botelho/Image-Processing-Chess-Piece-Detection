@@ -27,10 +27,10 @@ namespace CG_OpenCV.Services
                 try
                 {
                     Image<Bgr, byte> img = new Image<Bgr, byte>(filePath);
-                    int[,] histogram = ImageClass.Histogram_RGB(img);      
+                    var histogram = ImageClass.Histogram_Gray(img);      
                     var imgName = Path.GetFileName(filePath);
                     PrintHistogram(histogram, imgName);
-                    PieceHistograms.Add(new PieceHistogram() { HistogramValueRGB = histogram , Name = imgName });
+                    PieceHistograms.Add(new PieceHistogram() { HistogramValues = histogram , Name = imgName });
                 }
                 catch (Exception ex) { throw ex; }
 
