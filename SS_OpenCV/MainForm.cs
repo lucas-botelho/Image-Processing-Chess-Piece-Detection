@@ -177,7 +177,7 @@ namespace CG_OpenCV
 
             string[] pecas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
 
-            var hisCalculator = new HistrogramCalculator(pecas);
+            var hisCalculator = new ExampleImagesHistrogramCalculator(pecas);
 
             this.PieceHistograms = hisCalculator.Calculate();
         }

@@ -10,11 +10,11 @@ using System.IO;
 
 namespace CG_OpenCV.Services
 {
-    internal class HistrogramCalculator
+    internal class ExampleImagesHistrogramCalculator
     {
         public List<PieceHistogram> PieceHistograms { get; set; }
         public string[] ImagesPaths { get; set; }
-        public HistrogramCalculator(string[] imagesPaths)
+        public ExampleImagesHistrogramCalculator(string[] imagesPaths)
         {
             this.PieceHistograms = new List<PieceHistogram>();
             this.ImagesPaths = imagesPaths;
