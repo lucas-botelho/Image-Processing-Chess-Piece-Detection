@@ -44,7 +44,7 @@ namespace CG_OpenCV.Services
             Console.WriteLine($"IMAGEM:{imgName}");
             for (int i = 0; i < 256; i++)
             {
-                Console.WriteLine($"Value {i}: B={histogram[0, i]} G={histogram[1, i]} R={histogram[2, i]}");
+                //Console.WriteLine($"Value {i}: B={histogram[0, i]} G={histogram[1, i]} R={histogram[2, i]}");
             }
         }
 
