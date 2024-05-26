@@ -39,7 +39,7 @@ namespace CG_OpenCV.Services
             return this.PieceHistograms;
         }
 
-        private void PrintHistogram(int[,] histogram, string imgName)
+        private void PrintHistogram(int[] histogram, string imgName)
         {
             Console.WriteLine($"IMAGEM:{imgName}");
             for (int i = 0; i < 256; i++)
