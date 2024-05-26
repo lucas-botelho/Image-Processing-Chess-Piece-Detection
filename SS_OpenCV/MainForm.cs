@@ -172,7 +172,14 @@ namespace CG_OpenCV
 
         private void calcularHistogramasToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string relativePath = Path.Combine("..", "..", "BD Chess");
+            string absolutePath = Path.GetFullPath(relativePath);
 
+            string[] pecas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
+
+            var hisCalculator = new HistrogramCalculator(pecas);
+
+            this.PieceHistograms = hisCalculator.Calculate();
         }
         private void binarizationToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -191,17 +198,11 @@ namespace CG_OpenCV
             Cursor = Cursors.Default; // normal cursor 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void cropTabuleiroToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string relativePath = Path.Combine("..", "..", "BD Chess");
-            string absolutePath = Path.GetFullPath(relativePath);
+            var bcroper = new BoardCroper(img);
 
-            string[] pecas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
-
-            var hisCalculator = new HistrogramCalculator(pecas);
-
-            this.PieceHistograms = hisCalculator.Calculate();
-
+            bcroper.CropBoard();
         }
     }
 }
