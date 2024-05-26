@@ -4128,8 +4128,8 @@ namespace CG_OpenCV
                 int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
                 int x, y;
                 int step = m.widthStep;
-                int[] histogramX = new int[width]; //holds the percentage of 255 on that X column
-                int[] histogramY = new int[height]; //holds the percentage of 255 of that Y line
+                float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
+                float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
                 if (nChan == 3) // image in RGB RedGreenBlue
                 {
                     
@@ -4144,7 +4144,7 @@ namespace CG_OpenCV
 
                             Color original = Color.FromArgb(red, green, blue);
                             ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (70 < hue && hue < 320)
+                            if (150 < hue && hue < 240)
                             {
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;
@@ -4159,7 +4159,7 @@ namespace CG_OpenCV
                             }
                         }
                     }
-                    int thresholdPertenceTabuleiro = 2;
+                    int thresholdPertenceTabuleiro = 3;
                     //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
                     // Initialize min and max values for X and Y
                     int minX = -1, maxX = -1, minY = -1, maxY = -1;
