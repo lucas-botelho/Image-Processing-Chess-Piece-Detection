@@ -8,6 +8,12 @@ using System.Diagnostics.Contracts;
 using static Emgu.CV.StereoSGBM;
 using System.Linq;
 using System.Drawing;
+using CG_OpenCV.Services;
+using Emgu.CV.Flann;
+using System.Drawing.Drawing2D;
+using System.IO;
+using Emgu.CV.CvEnum;
+using System.Drawing.Imaging;
 
 namespace CG_OpenCV
 {
@@ -4132,7 +4138,7 @@ namespace CG_OpenCV
                 float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
                 if (nChan == 3) // image in RGB RedGreenBlue
                 {
-                    
+
                     for (y = 0; y < height; y++)
                     {
                         for (x = 0; x < width; x++)
@@ -4152,7 +4158,8 @@ namespace CG_OpenCV
                                 (dataPtr + x * nChan + y * step)[1] = 0;
                                 (dataPtr + x * nChan + y * step)[2] = 0;
                             }
-                            else {
+                            else
+                            {
                                 (dataPtr + x * nChan + y * step)[0] = 255;
                                 (dataPtr + x * nChan + y * step)[1] = 255;
                                 (dataPtr + x * nChan + y * step)[2] = 255;
@@ -4201,8 +4208,217 @@ namespace CG_OpenCV
 
 
 
+        public static void BinarizeImageWithColorToHsv(Image<Bgr, byte> img)
+        {
+            var bcroper = new BoardCroper(img);
+
+            unsafe
+            {
+                MIplImage m = img.MIplImage;
+                byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
+                byte blue, green, red;
+
+                int width = img.Width;
+                int height = img.Height;
+                int nChan = m.nChannels; // number of channels - 3
+                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+                int x, y;
+                int step = m.widthStep;
+                float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
+                float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
+                if (nChan == 3) // image in RGB RedGreenBlue
+                {
+                    for (y = 0; y < height; y++)
+                    {
+                        for (x = 0; x < width; x++)
+                        {
+                            //retrive 3 colour components
+                            blue = (dataPtr + x * nChan + y * step)[0];
+                            green = (dataPtr + x * nChan + y * step)[1];
+                            red = (dataPtr + x * nChan + y * step)[2];
+
+                            Color original = Color.FromArgb(red, green, blue);
+                            bcroper.ColorToHSV(original, out var hue, out var saturation, out var value);
+                            if (70 < hue && hue < 320) //DAR O TUNE AQUI
+                            {
+                                histogramY[y] = histogramY[y] + 1;
+                                histogramX[x] = histogramX[x] + 1;
+                                (dataPtr + x * nChan + y * step)[0] = 0;
+                                (dataPtr + x * nChan + y * step)[1] = 0;
+                                (dataPtr + x * nChan + y * step)[2] = 0;
+                            }
+                            else
+                            {
+                                (dataPtr + x * nChan + y * step)[0] = 255;
+                                (dataPtr + x * nChan + y * step)[1] = 255;
+                                (dataPtr + x * nChan + y * step)[2] = 255;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public static void BinarizeImageWithColorToHsvBlack(Image<Bgr, byte> img)
+        {
+            var bcroper = new BoardCroper(img);
+
+            unsafe
+            {
+                MIplImage m = img.MIplImage;
+                byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
+                byte blue, green, red;
+
+                int width = img.Width;
+                int height = img.Height;
+                int nChan = m.nChannels; // number of channels - 3
+                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+                int x, y;
+                int step = m.widthStep;
+                if (nChan == 3) // image in RGB RedGreenBlue
+                {
+                    for (y = 0; y < height; y++)
+                    {
+                        for (x = 0; x < width; x++)
+                        {
+                            //retrive 3 colour components
+                            blue = (dataPtr + x * nChan + y * step)[0];
+                            green = (dataPtr + x * nChan + y * step)[1];
+                            red = (dataPtr + x * nChan + y * step)[2];
+
+                            Color original = Color.FromArgb(red, green, blue);
+                            bcroper.ColorToHSV(original, out var hue, out var saturation, out var value);
+                            if (value == 0) //DAR O TUNE AQUI
+                            {
+
+                                (dataPtr + x * nChan + y * step)[0] = 0;
+                                (dataPtr + x * nChan + y * step)[1] = 0;
+                                (dataPtr + x * nChan + y * step)[2] = 0;
+                            }
+                            else
+                            {
+                                (dataPtr + x * nChan + y * step)[0] = 255;
+                                (dataPtr + x * nChan + y * step)[1] = 255;
+                                (dataPtr + x * nChan + y * step)[2] = 255;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
+
+        public static double Pixels_Iguais(Image<Bgr, byte> imagem, Image<Bgr, byte> imagemBD, string nomeImgBd)
+        {
+            unsafe
+            {
+                // direct access to the image memory(sequencial)
+                // direcion top left -> bottom right
+
+                //Imagem que vai ser comparada
+                MIplImage m = imagem.MIplImage;
+                byte* dataPtrImagem = (byte*)m.imageData.ToPointer(); // Pointer to the image
+
+
+                //Imagem da base de dados
+                MIplImage mBD = imagemBD.MIplImage;
+                byte* dataPtrImagemBD = (byte*)mBD.imageData.ToPointer(); // Pointer to the image
+
+                byte blue, green, red;
+
+                double percentagemIgualidade = 0;
+                int numeroPixeisIguais = 0;
+                int width = imagem.Width;
+                int height = imagem.Height;
+                int nChan = m.nChannels; // number of channels - 3
+                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+                int x, y;
+                int step = m.widthStep;
+                if (nChan == 3) // image in RGB
+                {
+                    for (y = 0; y < height; y++)
+                    {
+                        for (x = 0; x < width; x++)
+                        {
+                            //retrive 3 colour components
+                            blue = (byte)(int)Math.Round((double)(dataPtrImagem + nChan * x + step * y)[0]);
+                            green = (byte)(int)Math.Round((double)(dataPtrImagem + nChan * x + step * y)[1]);
+                            red = (byte)(int)Math.Round((double)(dataPtrImagem + nChan * x + step * y)[2]);
+
+                            //retrive 3 colour components Base de Dados
+                            var blueBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[0]);
+                            var greenBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[1]);
+                            var redBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[2]);
+
+                            
+
+                        }
+                    }
+                }
+                percentagemIgualidade = (numeroPixeisIguais / (double)(width * height)) * 100;
+
+
+                return percentagemIgualidade;
+            }
+        }
+
+        public static string dizerTipoPeca(Image<Bgr, byte> img)
+        {
+            string relativePath = Path.Combine("..", "..", "BD Chess");
+            string absolutePath = Path.GetFullPath(relativePath);
+            string[] Base_Dados = Directory.GetFiles(relativePath);
+
+
+            int aux = Base_Dados.Length;
+            Image<Bgr, byte> img_BD;
+            double[] relacoes = new double[aux];
+
+            //PERCORRER BASE DE DADOS
+            for (int B_D = 0; B_D < aux; B_D++)
+            {
+                img_BD = new Image<Bgr, Byte>(Base_Dados[B_D]);
+                img = img.Resize(img_BD.Width, img_BD.Height, INTER.CV_INTER_CUBIC);
+
+                try
+                {
+                    string relativeSavingPath1 = Path.Combine("..", "..", $"dizerTipoPeca/original.png");
+                    string absoluteSavingPath1 = Path.GetFullPath(relativeSavingPath1);
+
+                    string relativeSavingPath2 = Path.Combine("..", "..", $"dizerTipoPeca/bd.png");
+                    string absoluteSavingPath2 = Path.GetFullPath(relativeSavingPath2);
+                    // Ensure the directory exists
+                    string directory = Path.GetDirectoryName(absoluteSavingPath1);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    ImageClass.BinarizeImageWithColorToHsvBlack(img); //Binarizacao das imagems v menos 0.2
+                                                                      // Copy the image and save it
+                    using (var imgOriginalCortadaHsv = img.Copy())
+                    {
+                        imgOriginalCortadaHsv.Bitmap.Save(absoluteSavingPath1, ImageFormat.Png);
+                    }
+
+                    ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
+
+                    // Copy the image and save it
+                    using (var imgBdHsv = img_BD.Copy())
+                    {
+                        imgBdHsv.Bitmap.Save(absoluteSavingPath2, ImageFormat.Png);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+               
+                relacoes[B_D] = Pixels_Iguais(img, img_BD, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
+            }
+            string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Max())];
+            return Path.GetFileNameWithoutExtension(path); //o Nome da peca correspondente
+        }
 
     }
 }

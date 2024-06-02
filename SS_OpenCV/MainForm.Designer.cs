@@ -53,10 +53,12 @@
             this.evalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.calcularHistogramasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cropTabuleiroToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hSVPretoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.ImageViewer = new System.Windows.Forms.PictureBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.cropTabuleiroToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.qualPecaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageViewer)).BeginInit();
@@ -237,7 +239,9 @@
             // 
             this.helpersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.calcularHistogramasToolStripMenuItem,
-            this.cropTabuleiroToolStripMenuItem});
+            this.cropTabuleiroToolStripMenuItem,
+            this.hSVPretoToolStripMenuItem,
+            this.qualPecaToolStripMenuItem});
             this.helpersToolStripMenuItem.Name = "helpersToolStripMenuItem";
             this.helpersToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.helpersToolStripMenuItem.Text = "Helpers";
@@ -248,6 +252,20 @@
             this.calcularHistogramasToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.calcularHistogramasToolStripMenuItem.Text = "CalcularHistogramas";
             this.calcularHistogramasToolStripMenuItem.Click += new System.EventHandler(this.calcularHistogramasToolStripMenuItem_Click);
+            // 
+            // cropTabuleiroToolStripMenuItem
+            // 
+            this.cropTabuleiroToolStripMenuItem.Name = "cropTabuleiroToolStripMenuItem";
+            this.cropTabuleiroToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.cropTabuleiroToolStripMenuItem.Text = "CropTabuleiro";
+            this.cropTabuleiroToolStripMenuItem.Click += new System.EventHandler(this.cropTabuleiroToolStripMenuItem_Click);
+            // 
+            // hSVPretoToolStripMenuItem
+            // 
+            this.hSVPretoToolStripMenuItem.Name = "hSVPretoToolStripMenuItem";
+            this.hSVPretoToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.hSVPretoToolStripMenuItem.Text = "HSVPretoBD";
+            this.hSVPretoToolStripMenuItem.Click += new System.EventHandler(this.hSVPretoToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -268,12 +286,12 @@
             this.ImageViewer.TabIndex = 6;
             this.ImageViewer.TabStop = false;
             // 
-            // cropTabuleiroToolStripMenuItem
+            // qualPecaToolStripMenuItem
             // 
-            this.cropTabuleiroToolStripMenuItem.Name = "cropTabuleiroToolStripMenuItem";
-            this.cropTabuleiroToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.cropTabuleiroToolStripMenuItem.Text = "CropTabuleiro";
-            this.cropTabuleiroToolStripMenuItem.Click += new System.EventHandler(this.cropTabuleiroToolStripMenuItem_Click);
+            this.qualPecaToolStripMenuItem.Name = "qualPecaToolStripMenuItem";
+            this.qualPecaToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.qualPecaToolStripMenuItem.Text = "QualPeca";
+            this.qualPecaToolStripMenuItem.Click += new System.EventHandler(this.qualPecaToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -326,6 +344,8 @@
         private System.Windows.Forms.ToolStripMenuItem calcularHistogramasToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.ToolStripMenuItem cropTabuleiroToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hSVPretoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem qualPecaToolStripMenuItem;
     }
 }
 

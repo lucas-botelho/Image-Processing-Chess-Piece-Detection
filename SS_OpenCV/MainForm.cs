@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -190,7 +192,7 @@ namespace CG_OpenCV
             //copy Undo Image
             imgUndo = img.Copy();
 
-            ImageClass.ConvertToBW_Otsu(img);
+            ImageClass.BinarizeImageWithColorToHsv(img);
 
             ImageViewer.Image = img.Bitmap;
             ImageViewer.Refresh(); // refresh image on the screen
@@ -205,9 +207,113 @@ namespace CG_OpenCV
             var croppedBoard = bcroper.CropBoard();
 
             var imagensCortadinhas = bcroper.CropIndividualPieces(croppedBoard);
+        }
+
+        private void hSVPretoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string relativePath = Path.Combine("..", "..", "BD Chess");
+            string absolutePath = Path.GetFullPath(relativePath);
+
+            string[] pecasBd = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
+
+            foreach (var peca in pecasBd)
+            {
+                try
+                {
+                    // Load the image
+                    Image<Bgr, byte> img = new Image<Bgr, byte>(peca);
+
+                    // Apply the BinarizeImageWithColorToHsc method
+                    //ImageClass.BinarizeImageWithColorToHscBlack(img);
+                    ImageClass.BinarizeImageWithColorToHsvBlack(img);
+
+                    // Prepare the saving path
+                    string relativeSavingPath = Path.Combine("..", "..", $"ImagensBdBinarizadas/{Path.GetFileNameWithoutExtension(peca)}.png");
+                    string absoluteSavingPath = Path.GetFullPath(relativeSavingPath);
+
+                    // Ensure the directory exists
+                    string directory = Path.GetDirectoryName(absoluteSavingPath);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    // Copy the image and save it
+                    using (var imgCopy = img.Copy())
+                    {
+                        imgCopy.Bitmap.Save(absoluteSavingPath, ImageFormat.Png);
+                    }
+
+                    Console.WriteLine("Image saved successfully.");
+                }
+                catch (System.Runtime.InteropServices.ExternalException ex)
+                {
+                    Console.WriteLine("Error saving image: " + ex.Message);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Console.WriteLine("Permission error: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unexpected error: " + ex.Message);
+                }
+
+            }
+
+            relativePath = Path.Combine("..", "..", "ImagensCortadinhas");
+            absolutePath = Path.GetFullPath(relativePath);
+
+            string[] pecasCortadinhas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
+
+            foreach (var peca in pecasCortadinhas)
+            {
+                try
+                {
+                    // Load the image
+                    Image<Bgr, byte> img = new Image<Bgr, byte>(peca);
+
+                    // Apply the BinarizeImageWithColorToHsc method
+                    //ImageClass.BinarizeImageWithColorToHscBlack(img);
+                    ImageClass.BinarizeImageWithColorToHsvBlack(img);
+
+                    // Prepare the saving path
+                    string relativeSavingPath = Path.Combine("..", "..", $"ImagensCortadinhasBinarizadas/{Path.GetFileNameWithoutExtension(peca)}.png");
+                    string absoluteSavingPath = Path.GetFullPath(relativeSavingPath);
+
+                    // Ensure the directory exists
+                    string directory = Path.GetDirectoryName(absoluteSavingPath);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    // Copy the image and save it
+                    using (var imgCopy = img.Copy())
+                    {
+                        imgCopy.Bitmap.Save(absoluteSavingPath, ImageFormat.Png);
+                    }
+
+                    Console.WriteLine("Image saved successfully.");
+                }
+                catch (System.Runtime.InteropServices.ExternalException ex)
+                {
+                    Console.WriteLine("Error saving image: " + ex.Message);
+                }
+            }
+        }
+
+        private void qualPecaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (img == null) // verify if the image is already opened
+                return;
+            Cursor = Cursors.WaitCursor; // clock cursor 
 
 
-
+            MessageBox.Show(ImageClass.dizerTipoPeca(img),
+                           "Success",
+                           MessageBoxButtons.OK,
+                           MessageBoxIcon.Information);
         }
     }
 }
