@@ -4210,8 +4210,6 @@ namespace CG_OpenCV
 
         public static void BinarizeImageWithColorToHsv(Image<Bgr, byte> img)
         {
-            var bcroper = new BoardCroper(img);
-
             unsafe
             {
                 MIplImage m = img.MIplImage;
@@ -4238,7 +4236,7 @@ namespace CG_OpenCV
                             red = (dataPtr + x * nChan + y * step)[2];
 
                             Color original = Color.FromArgb(red, green, blue);
-                            bcroper.ColorToHSV(original, out var hue, out var saturation, out var value);
+                            ColorToHSV(original, out var hue, out var saturation, out var value);
                             if (70 < hue && hue < 320) //DAR O TUNE AQUI
                             {
                                 histogramY[y] = histogramY[y] + 1;
@@ -4260,7 +4258,7 @@ namespace CG_OpenCV
         }
         public static void BinarizeImageWithColorToHsvBlack(Image<Bgr, byte> img)
         {
-            var bcroper = new BoardCroper(img);
+            var bcroper = new CropperService();
 
             unsafe
             {
@@ -4286,7 +4284,7 @@ namespace CG_OpenCV
                             red = (dataPtr + x * nChan + y * step)[2];
 
                             Color original = Color.FromArgb(red, green, blue);
-                            bcroper.ColorToHSV(original, out var hue, out var saturation, out var value);
+                            ColorToHSV(original, out var hue, out var saturation, out var value);
                             if (value == 0) //DAR O TUNE AQUI
                             {
 
@@ -4308,13 +4306,10 @@ namespace CG_OpenCV
 
 
 
-        public static double Pixels_Iguais(Image<Bgr, byte> imagem, Image<Bgr, byte> imagemBD, string nomeImgBd)
+        public static (double, string) CalculateIgualityPercentage(Image<Bgr, byte> imagem, Image<Bgr, byte> imagemBD, string nomeImgBd)
         {
             unsafe
             {
-                // direct access to the image memory(sequencial)
-                // direcion top left -> bottom right
-
                 //Imagem que vai ser comparada
                 MIplImage m = imagem.MIplImage;
                 byte* dataPtrImagem = (byte*)m.imageData.ToPointer(); // Pointer to the image
@@ -4350,71 +4345,43 @@ namespace CG_OpenCV
                             var greenBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[1]);
                             var redBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[2]);
 
-                            
-
+                            if (blue == blueBD && green == greenBD && red == redBD)
+                            {
+                                numeroPixeisIguais++;
+                            }
                         }
                     }
                 }
                 percentagemIgualidade = (numeroPixeisIguais / (double)(width * height)) * 100;
 
 
-                return percentagemIgualidade;
+                return (percentagemIgualidade, nomeImgBd);
             }
         }
 
-        public static string dizerTipoPeca(Image<Bgr, byte> img)
+        public static string DizerNomePeca(Image<Bgr, byte> img)
         {
-            string relativePath = Path.Combine("..", "..", "BD Chess");
-            string absolutePath = Path.GetFullPath(relativePath);
-            string[] Base_Dados = Directory.GetFiles(relativePath);
-
+            string[] Base_Dados = Directory.GetFiles(Helper.FolderPath("BD Chess"));
 
             int aux = Base_Dados.Length;
             Image<Bgr, byte> img_BD;
-            double[] relacoes = new double[aux];
+            (double, string)[] relacoes = new (double, string)[aux];
+
+            var figure = new CropperService().CropFigureFromPieceImage(img);
+            ImageClass.BinarizeImageWithColorToHsvBlack(figure);
+
 
             //PERCORRER BASE DE DADOS
             for (int B_D = 0; B_D < aux; B_D++)
             {
                 img_BD = new Image<Bgr, Byte>(Base_Dados[B_D]);
-                img = img.Resize(img_BD.Width, img_BD.Height, INTER.CV_INTER_CUBIC);
+                ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
+                var figureBd = new CropperService().CropFigureFromPieceImage(img_BD);
+                var figureResized = figure.Resize(figureBd.Width, figureBd.Height, INTER.CV_INTER_CUBIC);
 
-                try
-                {
-                    string relativeSavingPath1 = Path.Combine("..", "..", $"dizerTipoPeca/original.png");
-                    string absoluteSavingPath1 = Path.GetFullPath(relativeSavingPath1);
-
-                    string relativeSavingPath2 = Path.Combine("..", "..", $"dizerTipoPeca/bd.png");
-                    string absoluteSavingPath2 = Path.GetFullPath(relativeSavingPath2);
-                    // Ensure the directory exists
-                    string directory = Path.GetDirectoryName(absoluteSavingPath1);
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-
-                    ImageClass.BinarizeImageWithColorToHsvBlack(img); //Binarizacao das imagems v menos 0.2
-                                                                      // Copy the image and save it
-                    using (var imgOriginalCortadaHsv = img.Copy())
-                    {
-                        imgOriginalCortadaHsv.Bitmap.Save(absoluteSavingPath1, ImageFormat.Png);
-                    }
-
-                    ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
-
-                    // Copy the image and save it
-                    using (var imgBdHsv = img_BD.Copy())
-                    {
-                        imgBdHsv.Bitmap.Save(absoluteSavingPath2, ImageFormat.Png);
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                    throw ex;
-                }
+                Helper.ProcessAndSaveImages(figureResized, figureBd);
                
-                relacoes[B_D] = Pixels_Iguais(img, img_BD, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
+                relacoes[B_D] = CalculateIgualityPercentage(figureResized, figureBd, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
             }
             string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Max())];
             return Path.GetFileNameWithoutExtension(path); //o Nome da peca correspondente

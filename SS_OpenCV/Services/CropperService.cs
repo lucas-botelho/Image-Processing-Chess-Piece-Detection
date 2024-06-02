@@ -14,24 +14,17 @@ using System.Collections.Generic;
 
 namespace CG_OpenCV.Services
 {
-    internal class BoardCroper
+    internal class CropperService
     {
-        Image<Bgr, Byte> imgCopy = null; // working image
-        Image<Bgr, Byte> imgOriginal = null; // working image
-        public BoardCroper(Image<Bgr, Byte> img)
-        {
-            this.imgOriginal = img;
-            this.imgCopy = img.Copy();
-        }
 
-        public Image<Bgr, Byte> CropBoard()
+        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> imgOriginal)
         {
-            var coords = this.FindBoardCoords();
+            var coords = this.FindBoardCoords(imgOriginal.Copy());
 
             int width = Math.Abs(coords[0].X - coords[1].X);
             int height = Math.Abs(coords[0].Y - coords[1].Y);
 
-            var croppedImg = this.imgOriginal.GetSubRect(new Rectangle(coords[0].X, coords[1].Y, width, height));
+            var croppedImg = imgOriginal.GetSubRect(new Rectangle(coords[0].X, coords[1].Y, width, height));
 
             string relativePath = Path.Combine("..", "..", "ImagensTeste/fullImageAfterCrop.png");
             string absolutePath = Path.GetFullPath(relativePath);
@@ -40,16 +33,8 @@ namespace CG_OpenCV.Services
             return croppedImg;
         }
 
-        //trocamos o range do hue para comecar a 150, a 70 apanhava o verde
-        public void ColorToHSV(Color color, out double hue, out double saturation, out double value)
-        {
-            int max = Math.Max(color.R, Math.Max(color.G, color.B));
-            int min = Math.Min(color.R, Math.Min(color.G, color.B));
-            hue = color.GetHue();
-            saturation = (max == 0) ? 0 : 1d - (1d * min / max);
-            value = max / 255d;
-        }
-        public Coord[] FindBoardCoords()
+
+        public Coord[] FindBoardCoords(Image<Bgr, Byte> imgCopy)
         {
             int minX = -1, maxX = -1, minY = -1, maxY = -1;
 
@@ -79,7 +64,7 @@ namespace CG_OpenCV.Services
                             red = (dataPtr + x * nChan + y * step)[2];
 
                             Color original = Color.FromArgb(red, green, blue);
-                            ColorToHSV(original, out var hue, out var saturation, out var value);
+                            ImageClass.ColorToHSV(original, out var hue, out var saturation, out var value);
                             if (150 < hue && hue < 320) //DAR O TUNE AQUI
                             {
                                 histogramY[y] = histogramY[y] + 1;
@@ -138,7 +123,7 @@ namespace CG_OpenCV.Services
                 new Coord(maxX,minY),
             };
         }
-        public Coord[] FindPieceCoor()
+        public Coord[] FindPieceCoord(Image<Bgr, Byte> imgCopy)
         {
             int minX = -1, maxX = -1, minY = -1, maxY = -1;
 
@@ -175,7 +160,7 @@ namespace CG_OpenCV.Services
                             } 
                         }
                     }
-                    int thresholdPertenceTabuleiro = 3; //Alter threshold de percentagem
+                    int thresholdPertenceTabuleiro = 1; //Alter threshold de percentagem
                     //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
                     // Initialize min and max values for X and Y
 
@@ -218,7 +203,7 @@ namespace CG_OpenCV.Services
             };
         }
 
-        public IEnumerable<Image<Bgr, Byte>> CropIndividualPieces(Image<Bgr, Byte> croppedBoard)
+        public IEnumerable<Image<Bgr, Byte>> CropIndividualImagePieces(Image<Bgr, Byte> croppedBoard)
         {
             var width = croppedBoard.MIplImage.width;
             var height = croppedBoard.MIplImage.height;
@@ -244,5 +229,25 @@ namespace CG_OpenCV.Services
 
             return pieces;
         }
+
+
+        public Image<Bgr, Byte> CropFigureFromPieceImage(Image<Bgr, Byte> pieceImage)
+        {
+            //[0] x min e x max
+            //[1] y min e y max
+            var coords = this.FindPieceCoord(pieceImage.Copy());
+
+            int width = Math.Abs(coords[0].X - coords[0].Y);
+            int height = Math.Abs(coords[1].X - coords[1].Y);
+
+            var croppedImg = pieceImage.GetSubRect(new Rectangle(coords[0].X, coords[1].X, width+1, height+1));
+
+            string relativePath = Path.Combine("..", "..", $"FigurasCortadinhas/{coords[0].X}{coords[1].Y}.png");
+            string absolutePath = Path.GetFullPath(relativePath);
+            croppedImg.Bitmap.Save(absolutePath, ImageFormat.Png);
+
+            return croppedImg;
+        }
+
     }
 }

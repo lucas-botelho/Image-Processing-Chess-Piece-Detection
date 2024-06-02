@@ -12,11 +12,10 @@ namespace CG_OpenCV.Models
     internal class Board
     {
         public PecaImagem[,] ImagesBoardOriginal { get; set; }
-        public BoardCroper BoardCropperService { get; set; }
+        public CropperService BoardCropperService { get; set; }
 
         public Board(Image<Bgr, Byte> boardInteiro)
         {
-            this.BoardCropperService = new BoardCroper(boardInteiro.Copy());
         }
     }
 }
