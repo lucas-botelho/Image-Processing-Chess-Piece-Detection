@@ -4285,7 +4285,7 @@ namespace CG_OpenCV
 
                             Color original = Color.FromArgb(red, green, blue);
                             ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (value == 0) //DAR O TUNE AQUI
+                            if (value < 0.3) //DAR O TUNE AQUI
                             {
 
                                 (dataPtr + x * nChan + y * step)[0] = 0;
@@ -4368,6 +4368,9 @@ namespace CG_OpenCV
             (double, string)[] relacoes = new (double, string)[aux];
 
             var figure = new CropperService().CropFigureFromPieceImage(img);
+
+
+
             ImageClass.BinarizeImageWithColorToHsvBlack(figure);
 
 
