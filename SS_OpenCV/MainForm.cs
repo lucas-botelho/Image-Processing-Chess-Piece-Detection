@@ -24,14 +24,31 @@ namespace CG_OpenCV
         {
             InitializeComponent();
             title_bak = Text;
+            PopulateComboBox();
         }
 
-        /// <summary>
-        /// Opens a new image
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void PopulateComboBox()
+        {
+            // Column labels for a chessboard
+            char[] columns = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
+
+            // Loop through each row and column to generate board squares
+            foreach (char column in columns)
+            {
+                for (int row = 1; row <= 8; row++)
+                {
+                    string square = $"{column}{row}";
+                    comboBox1.Items.Add(square);
+                }
+            }
+        }
+
+    /// <summary>
+    /// Opens a new image
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -227,6 +244,27 @@ namespace CG_OpenCV
                            "Success",
                            MessageBoxButtons.OK,
                            MessageBoxIcon.Information);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(comboBox1.SelectedItem.ToString()) || img == null)
+            {
+                MessageBox.Show(ImageClass.DizerNomePeca(img),
+                          "Warning",
+                          MessageBoxButtons.OK,
+                          MessageBoxIcon.Warning);
+
+                return;
+            }
+            Cursor = Cursors.WaitCursor;
+
+
+            new CropperService().CropBoard(img);
+
+
+
+
         }
     }
 }
