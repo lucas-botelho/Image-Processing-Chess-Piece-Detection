@@ -106,10 +106,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\Board.cs" />
     <Compile Include="Models\Coord.cs" />
-    <Compile Include="Models\PecaImagem.cs" />
-    <Compile Include="Models\PieceHistogram.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CropperService.cs" />
@@ -168,6 +165,7 @@
   <ItemGroup>
     <None Include="Resources\logo_ulht.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

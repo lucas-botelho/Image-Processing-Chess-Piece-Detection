@@ -4359,7 +4359,7 @@ namespace CG_OpenCV
             }
         }
 
-        public static string DizerNomePeca(Image<Bgr, byte> img)
+        public static string GetNomePeca(Image<Bgr, byte> figure)
         {
             string[] Base_Dados = Directory.GetFiles(Helper.FolderPath("BD Chess"));
 
@@ -4367,16 +4367,14 @@ namespace CG_OpenCV
             Image<Bgr, byte> img_BD;
             (double, string)[] relacoes = new (double, string)[aux];
 
-            var figure = new CropperService().CropFigureFromPieceImage(img);
             ImageClass.BinarizeImageWithColorToHsvBlack(figure);
-
 
             //PERCORRER BASE DE DADOS
             for (int B_D = 0; B_D < aux; B_D++)
             {
                 img_BD = new Image<Bgr, Byte>(Base_Dados[B_D]);
                 ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
-                var figureBd = new CropperService().CropFigureFromPieceImage(img_BD);
+                var figureBd = new CropperService().CropFigure(img_BD);
                 var figureResized = figure.Resize(figureBd.Width, figureBd.Height, INTER.CV_INTER_CUBIC);
 
                 Helper.ProcessAndSaveImages(figureResized, figureBd);

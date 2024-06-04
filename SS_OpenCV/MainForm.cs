@@ -15,15 +15,16 @@ namespace CG_OpenCV
     public partial class MainForm : Form
     {
         Image<Bgr, Byte> img = null; // working image
+        Image<Bgr, Byte> croppedBoard = null; // working image
         Image<Bgr, Byte> imgUndo = null; // undo backup image - UNDO
         string title_bak = "";
-        List<PieceHistogram> PieceHistograms { get; set; }
-
+        
 
         public MainForm()
         {
             InitializeComponent();
             title_bak = Text;
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             PopulateComboBox();
         }
 
@@ -188,18 +189,6 @@ namespace CG_OpenCV
 
             Cursor = Cursors.Default; // normal cursor 
         }
-
-        private void calcularHistogramasToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string relativePath = Path.Combine("..", "..", "BD Chess");
-            string absolutePath = Path.GetFullPath(relativePath);
-
-            string[] pecas = Directory.GetFiles(absolutePath, "*", SearchOption.AllDirectories);
-
-            var hisCalculator = new ExampleImagesHistrogramCalculator(pecas);
-
-            this.PieceHistograms = hisCalculator.Calculate();
-        }
         private void binarizationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (img == null) // verify if the image is already opened
@@ -220,8 +209,8 @@ namespace CG_OpenCV
         private void cropTabuleiroToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var cropperService = new CropperService();
-            var croppedBoard = cropperService.CropBoard(img);
-            var imagensCortadinhas = cropperService.CropIndividualImagePieces(croppedBoard);
+            var croppedBoard = cropperService.CropBoardAndSaveImage(img);
+            var imagensCortadinhas = cropperService.CropHouseFromBoard(croppedBoard);
         }
 
         private void hSVPretoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -240,7 +229,7 @@ namespace CG_OpenCV
             Cursor = Cursors.WaitCursor; // clock cursor 
 
 
-            MessageBox.Show(ImageClass.DizerNomePeca(img),
+            MessageBox.Show(ImageClass.GetNomePeca(img),
                            "Success",
                            MessageBoxButtons.OK,
                            MessageBoxIcon.Information);
@@ -248,22 +237,38 @@ namespace CG_OpenCV
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(comboBox1.SelectedItem.ToString()) || img == null)
+            var casa = comboBox1.SelectedItem.ToString();
+            if (string.IsNullOrEmpty(casa) || img == null)
             {
-                MessageBox.Show(ImageClass.DizerNomePeca(img),
+                MessageBox.Show("Por favor selecione uma casa do tabuleiro.",
                           "Warning",
                           MessageBoxButtons.OK,
                           MessageBoxIcon.Warning);
-
                 return;
             }
-            Cursor = Cursors.WaitCursor;
 
+            var boardImageCopy = img.Copy();
+            var boardCropper = new CropperService();
+            croppedBoard = boardCropper.CropBoard(boardImageCopy);
+            var croppedHouse = boardCropper.CropBoardHouse(croppedBoard, casa);
 
-            new CropperService().CropBoard(img);
+            if (croppedHouse == null)
+            {
+                MessageBox.Show("Casa não encontrada.",
+                          "Warning",
+                          MessageBoxButtons.OK,
+                          MessageBoxIcon.Warning);
+                return;
+            }
 
+            var pieceFigure = boardCropper.CropFigure(croppedHouse);
 
+            //verificar se e uma casa vazia
 
+            MessageBox.Show(ImageClass.GetNomePeca(pieceFigure),
+                           "Success",
+                           MessageBoxButtons.OK,
+                           MessageBoxIcon.Information);
 
         }
     }

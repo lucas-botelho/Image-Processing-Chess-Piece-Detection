@@ -17,7 +17,7 @@ namespace CG_OpenCV.Services
     internal class CropperService
     {
 
-        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> imgOriginal)
+        public Image<Bgr, Byte> CropBoardAndSaveImage(Image<Bgr, Byte> imgOriginal)
         {
             var coords = this.FindBoardCoords(imgOriginal.Copy());
 
@@ -32,7 +32,6 @@ namespace CG_OpenCV.Services
 
             return croppedImg;
         }
-
 
         public Coord[] FindBoardCoords(Image<Bgr, Byte> imgCopy)
         {
@@ -203,7 +202,7 @@ namespace CG_OpenCV.Services
             };
         }
 
-        public IEnumerable<Image<Bgr, Byte>> CropIndividualImagePieces(Image<Bgr, Byte> croppedBoard)
+        public IEnumerable<Image<Bgr, Byte>> CropHouseFromBoard(Image<Bgr, Byte> croppedBoard)
         {
             var width = croppedBoard.MIplImage.width;
             var height = croppedBoard.MIplImage.height;
@@ -211,15 +210,20 @@ namespace CG_OpenCV.Services
             var pieceWidth = width / 8;
             var pieceHeight = height / 8;
 
+            var letter = "A";
+            var number = 1;
+
             for (int y = 0; y < height; y += pieceHeight)
             {
+                letter += 1;
                 for (int x = 0; x < width; x += pieceWidth)
                 {
+                    number++;
                     if (x + pieceWidth > width) break;
                     var imagemCortadinha = croppedBoard.GetSubRect(new Rectangle(x, y, pieceWidth, pieceHeight));
                     pieces.Add(imagemCortadinha);
 
-                    string relativePath = Path.Combine("..", "..", $"ImagensCortadinhas/x{x}y{y}.png");
+                    string relativePath = Path.Combine("..", "..", $"ImagensCortadinhas/{letter}{number}.png");
                     string absolutePath = Path.GetFullPath(relativePath);
                     imagemCortadinha.Bitmap.Save(absolutePath, ImageFormat.Png);
                 }
@@ -230,17 +234,16 @@ namespace CG_OpenCV.Services
             return pieces;
         }
 
-
-        public Image<Bgr, Byte> CropFigureFromPieceImage(Image<Bgr, Byte> pieceImage)
+        public Image<Bgr, Byte> CropFigure(Image<Bgr, Byte> houseImg)
         {
             //[0] x min e x max
             //[1] y min e y max
-            var coords = this.FindPieceCoord(pieceImage.Copy());
+            var coords = this.FindPieceCoord(houseImg.Copy());
 
             int width = Math.Abs(coords[0].X - coords[0].Y);
             int height = Math.Abs(coords[1].X - coords[1].Y);
 
-            var croppedImg = pieceImage.GetSubRect(new Rectangle(coords[0].X, coords[1].X, width+1, height+1));
+            var croppedImg = houseImg.GetSubRect(new Rectangle(coords[0].X, coords[1].X, width+1, height+1));
 
             string relativePath = Path.Combine("..", "..", $"FigurasCortadinhas/{coords[0].X}{coords[1].Y}.png");
             string absolutePath = Path.GetFullPath(relativePath);
@@ -248,6 +251,73 @@ namespace CG_OpenCV.Services
 
             return croppedImg;
         }
+
+
+
+
+        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg)
+        {
+            // Encontra as coordenadas do tabuleiro na imagem
+            var boardCoords = this.FindBoardCoords(boardImg);
+
+            // Calcula a largura do tabuleiro como a diferença absoluta entre as coordenadas X dos dois pontos opostos
+            int boardWidth = Math.Abs(boardCoords[0].X - boardCoords[1].X);
+
+            // Calcula a altura do tabuleiro como a diferença absoluta entre as coordenadas Y dos dois pontos opostos
+            int boardHeight = Math.Abs(boardCoords[0].Y - boardCoords[1].Y);
+
+            // Retorna a subimagem do tabuleiro recortado
+            return boardImg.GetSubRect(new Rectangle(boardCoords[0].X, boardCoords[1].Y, boardWidth, boardHeight));
+        }
+
+        public Image<Bgr, Byte> CropBoardHouse(Image<Bgr, Byte> croppedBoard, string boardHouse)
+        {
+            // Obtém a largura do tabuleiro recortado
+            var boardWidth = croppedBoard.MIplImage.width;
+
+            // Obtém a altura do tabuleiro recortado
+            var boardHeight = croppedBoard.MIplImage.height;
+
+            // Calcula a largura de uma casa do tabuleiro
+            var houseWidth = boardWidth / 8;
+
+            // Calcula a altura de uma casa do tabuleiro
+            var houseHeight = boardHeight / 8;
+
+            // Inicializa a letra e o número para identificar as casas do tabuleiro
+            var letter = "A";
+            var number = 1;
+
+            // Percorre as linhas do tabuleiro
+            for (int y = 0; y < boardHeight; y += houseHeight)
+            {
+                // Percorre as colunas do tabuleiro
+                for (int x = 0; x < boardWidth; x += houseWidth)
+                {
+                    // Se a casa exceder a largura do tabuleiro, interrompe o loop
+                    if (x + houseWidth > boardWidth) break;
+
+                    // Verifica se a casa atual corresponde à casa especificada (boardHouse)
+                    if (boardHouse.Equals($"{letter}{number}"))
+                        // Retorna a subimagem correspondente à casa encontrada
+                        return croppedBoard.GetSubRect(new Rectangle(x, y, houseWidth, houseHeight));
+
+                    // Incrementa o número para a próxima linha
+                    number++;
+                }
+
+                // Incrementa a letra para a próxima coluna
+                letter = ((char)(letter[0] + 1)).ToString();
+
+                // Se a casa exceder a altura do tabuleiro, interrompe o loop
+                if (y + houseHeight > boardHeight) break;
+            }
+
+            // Retorna null se a casa especificada não for encontrada
+            return null;
+        }
+
+
 
     }
 }
