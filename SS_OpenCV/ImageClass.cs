@@ -4329,6 +4329,9 @@ namespace CG_OpenCV
                 int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
                 int x, y;
                 int step = m.widthStep;
+                int pixelOriginal = 0;
+                int pixelBD = 0;
+                int diferenca = 0;
                 if (nChan == 3) // image in RGB
                 {
                     for (y = 0; y < height; y++)
@@ -4345,17 +4348,13 @@ namespace CG_OpenCV
                             var greenBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[1]);
                             var redBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[2]);
 
-                            if (blue == blueBD && green == greenBD && red == redBD)
-                            {
-                                numeroPixeisIguais++;
-                            }
+                            pixelOriginal = (blue == 0 && green == 0 && red == 0) ? 1 : 0;
+                            pixelBD = (blueBD == 0 && greenBD == 0 && redBD == 0) ? 1 : 0;
+                            diferenca = diferenca + (pixelOriginal - pixelBD);
                         }
                     }
                 }
-                percentagemIgualidade = (numeroPixeisIguais / (double)(width * height)) * 100;
-
-
-                return (percentagemIgualidade, nomeImgBd);
+                return (diferenca, nomeImgBd);
             }
         }
 
@@ -4386,7 +4385,7 @@ namespace CG_OpenCV
                
                 relacoes[B_D] = CalculateIgualityPercentage(figureResized, figureBd, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
             }
-            string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Max())];
+            string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Min())];
             return Path.GetFileNameWithoutExtension(path); //o Nome da peca correspondente
         }
 
