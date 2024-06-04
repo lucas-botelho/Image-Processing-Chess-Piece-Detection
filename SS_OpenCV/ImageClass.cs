@@ -4285,7 +4285,7 @@ namespace CG_OpenCV
 
                             Color original = Color.FromArgb(red, green, blue);
                             ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (value < 0.3) //DAR O TUNE AQUI
+                            if (value < 0.25) //DAR O TUNE AQUI
                             {
 
                                 (dataPtr + x * nChan + y * step)[0] = 0;
@@ -4350,7 +4350,7 @@ namespace CG_OpenCV
 
                             pixelOriginal = (blue == 0 && green == 0 && red == 0) ? 1 : 0;
                             pixelBD = (blueBD == 0 && greenBD == 0 && redBD == 0) ? 1 : 0;
-                            diferenca = diferenca + (pixelOriginal - pixelBD);
+                            diferenca += Math.Abs(pixelOriginal - pixelBD);
                         }
                     }
                 }
@@ -4366,19 +4366,21 @@ namespace CG_OpenCV
             Image<Bgr, byte> img_BD;
             (double, string)[] relacoes = new (double, string)[aux];
 
-            ImageClass.BinarizeImageWithColorToHsvBlack(figure);
+            
 
             //PERCORRER BASE DE DADOS
             for (int B_D = 0; B_D < aux; B_D++)
             {
                 img_BD = new Image<Bgr, Byte>(Base_Dados[B_D]);
-                ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
                 var figureBd = new CropperService().CropFigure(img_BD);
-                var figureResized = figure.Resize(figureBd.Width, figureBd.Height, INTER.CV_INTER_CUBIC);
 
-                Helper.ProcessAndSaveImages(figureResized, figureBd);
+                var figureResized = figure.Resize(128, 128, INTER.CV_INTER_CUBIC);
+                var imgDbResized = figureBd.Resize(128, 128, INTER.CV_INTER_CUBIC);
+
+                //Passo para debug
+                Helper.SaveImagesLocally(figureResized, imgDbResized);
                
-                relacoes[B_D] = CalculateIgualityPercentage(figureResized, figureBd, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
+                relacoes[B_D] = CalculateIgualityPercentage(figureResized, imgDbResized, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
             }
             string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Min())];
             return Path.GetFileNameWithoutExtension(path); //o Nome da peca correspondente

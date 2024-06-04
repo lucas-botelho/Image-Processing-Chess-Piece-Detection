@@ -12,14 +12,14 @@ namespace CG_OpenCV.Services
 {
     internal static class Helper
     {
-        public static void ProcessAndSaveImages(Image<Bgr, byte> img, Image<Bgr, byte> img_BD)
+        public static void SaveImagesLocally(Image<Bgr, byte> img, Image<Bgr, byte> img_BD)
         {
             try
             {
-                string relativeSavingPath1 = Path.Combine("..", "..", $"dizerTipoPeca/original.png");
+                string relativeSavingPath1 = Path.Combine("..", "..", $"dizerTipoPeca/1originalResizedToBd.png");
                 string absoluteSavingPath1 = Path.GetFullPath(relativeSavingPath1);
 
-                string relativeSavingPath2 = Path.Combine("..", "..", $"dizerTipoPeca/bd.png");
+                string relativeSavingPath2 = Path.Combine("..", "..", $"dizerTipoPeca/1bd.png");
                 string absoluteSavingPath2 = Path.GetFullPath(relativeSavingPath2);
                 // Ensure the directory exists
                 string directory = Path.GetDirectoryName(absoluteSavingPath1);
@@ -28,14 +28,11 @@ namespace CG_OpenCV.Services
                     Directory.CreateDirectory(directory);
                 }
 
-                //ImageClass.BinarizeImageWithColorToHsvBlack(img); //Binarizacao das imagems v menos 0.2
-                                                                  // Copy the image and save it
+                // Copy the image and save it
                 using (var imgOriginalCortadaHsv = img.Copy())
                 {
                     imgOriginalCortadaHsv.Bitmap.Save(absoluteSavingPath1, ImageFormat.Png);
                 }
-
-                //ImageClass.BinarizeImageWithColorToHsvBlack(img_BD);
 
                 // Copy the image and save it
                 using (var imgBdHsv = img_BD.Copy())

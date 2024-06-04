@@ -236,6 +236,7 @@ namespace CG_OpenCV.Services
 
         public Image<Bgr, Byte> CropFigure(Image<Bgr, Byte> houseImg)
         {
+            ImageClass.BinarizeImageWithColorToHsvBlack(houseImg);
             //[0] x min e x max
             //[1] y min e y max
             var coords = this.FindPieceCoord(houseImg.Copy());
@@ -244,21 +245,18 @@ namespace CG_OpenCV.Services
             int height = Math.Abs(coords[1].X - coords[1].Y);
 
             var croppedImg = houseImg.GetSubRect(new Rectangle(coords[0].X, coords[1].X, width+1, height+1));
-
-            string relativePath = Path.Combine("..", "..", $"FigurasCortadinhas/{coords[0].X}{coords[1].Y}.png");
-            string absolutePath = Path.GetFullPath(relativePath);
-            croppedImg.Bitmap.Save(absolutePath, ImageFormat.Png);
-
             return croppedImg;
         }
 
 
 
 
-        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg)
+        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior)
         {
+            var boardCopyToWorkOn = boardImg.Copy();
+            var boardCopyToSubRect = boardImg.Copy();
             // Encontra as coordenadas do tabuleiro na imagem
-            var boardCoords = this.FindBoardCoords(boardImg);
+            var boardCoords = this.FindBoardCoords(boardCopyToWorkOn);
 
             // Calcula a largura do tabuleiro como a diferença absoluta entre as coordenadas X dos dois pontos opostos
             int boardWidth = Math.Abs(boardCoords[0].X - boardCoords[1].X);
@@ -266,8 +264,11 @@ namespace CG_OpenCV.Services
             // Calcula a altura do tabuleiro como a diferença absoluta entre as coordenadas Y dos dois pontos opostos
             int boardHeight = Math.Abs(boardCoords[0].Y - boardCoords[1].Y);
 
+            coordSuperior = $"({boardCoords[1].X},{boardCoords[1].Y})";
+            coordInferior = $"({boardCoords[1].X},{boardCoords[1].Y})";
+
             // Retorna a subimagem do tabuleiro recortado
-            return boardImg.GetSubRect(new Rectangle(boardCoords[0].X, boardCoords[1].Y, boardWidth, boardHeight));
+            return boardCopyToSubRect.GetSubRect(new Rectangle(boardCoords[0].X, boardCoords[1].Y, boardWidth, boardHeight));
         }
 
         public Image<Bgr, Byte> CropBoardHouse(Image<Bgr, Byte> croppedBoard, string boardHouse)
@@ -302,12 +303,13 @@ namespace CG_OpenCV.Services
                         // Retorna a subimagem correspondente à casa encontrada
                         return croppedBoard.GetSubRect(new Rectangle(x, y, houseWidth, houseHeight));
 
-                    // Incrementa o número para a próxima linha
+                    // Incrementa o número para a próxima coluna
                     number++;
                 }
 
-                // Incrementa a letra para a próxima coluna
+                // Incrementa a letra para a próxima linha e reiniciar 
                 letter = ((char)(letter[0] + 1)).ToString();
+                number = 1;
 
                 // Se a casa exceder a altura do tabuleiro, interrompe o loop
                 if (y + houseHeight > boardHeight) break;

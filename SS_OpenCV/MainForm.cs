@@ -9,12 +9,14 @@ using CG_OpenCV.Models;
 using CG_OpenCV.Services;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CG_OpenCV
 {
     public partial class MainForm : Form
     {
         Image<Bgr, Byte> img = null; // working image
+        Image<Bgr, Byte> imgRefresher = null; // working image
         Image<Bgr, Byte> croppedBoard = null; // working image
         Image<Bgr, Byte> imgUndo = null; // undo backup image - UNDO
         string title_bak = "";
@@ -237,6 +239,7 @@ namespace CG_OpenCV
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             var casa = comboBox1.SelectedItem.ToString();
             if (string.IsNullOrEmpty(casa) || img == null)
             {
@@ -247,10 +250,24 @@ namespace CG_OpenCV
                 return;
             }
 
-            var boardImageCopy = img.Copy();
             var boardCropper = new CropperService();
-            croppedBoard = boardCropper.CropBoard(boardImageCopy);
+            croppedBoard = boardCropper.CropBoard(img, out var cSuperior, out var cInferior);
+            ImageViewer.Image = img.Bitmap;
+
+            //Atualizar coordenadas em pixeis do tabuleiro
+            this.coordSuperior.Text = cSuperior.ToString();
+            this.coordInferior.Text = cInferior.ToString();
+
+            string relativePath = Path.Combine("..", "..", "dizerTipoPeca/croppedBoard.png");
+            string absolutePath = Path.GetFullPath(relativePath);
+            croppedBoard.Bitmap.Save(absolutePath, ImageFormat.Png);
+
             var croppedHouse = boardCropper.CropBoardHouse(croppedBoard, casa);
+
+            relativePath = Path.Combine("..", "..", "dizerTipoPeca/croppedHouse.png");
+            absolutePath = Path.GetFullPath(relativePath);
+            croppedHouse.Bitmap.Save(absolutePath, ImageFormat.Png);
+
 
             if (croppedHouse == null)
             {
@@ -262,8 +279,11 @@ namespace CG_OpenCV
             }
 
             var pieceFigure = boardCropper.CropFigure(croppedHouse);
+            relativePath = Path.Combine("..", "..", $"dizerTipoPeca/croppedFigure.png");
+            absolutePath = Path.GetFullPath(relativePath);
+            pieceFigure.Bitmap.Save(absolutePath, ImageFormat.Png);
 
-            //verificar se e uma casa vazia
+            //todo: verificar se e uma casa vazia
 
             MessageBox.Show(ImageClass.GetNomePeca(pieceFigure),
                            "Success",

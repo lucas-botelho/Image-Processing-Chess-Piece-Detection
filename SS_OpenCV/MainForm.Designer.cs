@@ -57,7 +57,8 @@
             this.hSVPretoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.qualPecaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.coorSuperior = new System.Windows.Forms.TextBox();
+            this.coordInferior = new System.Windows.Forms.TextBox();
+            this.coordSuperior = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -65,7 +66,6 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.ImageViewer = new System.Windows.Forms.PictureBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.coordInferior = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageViewer)).BeginInit();
@@ -256,26 +256,26 @@
             // calcularHistogramasToolStripMenuItem
             // 
             this.calcularHistogramasToolStripMenuItem.Name = "calcularHistogramasToolStripMenuItem";
-            this.calcularHistogramasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.calcularHistogramasToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             // 
             // cropTabuleiroToolStripMenuItem
             // 
             this.cropTabuleiroToolStripMenuItem.Name = "cropTabuleiroToolStripMenuItem";
-            this.cropTabuleiroToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cropTabuleiroToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.cropTabuleiroToolStripMenuItem.Text = "CropTabuleiro";
             this.cropTabuleiroToolStripMenuItem.Click += new System.EventHandler(this.cropTabuleiroToolStripMenuItem_Click);
             // 
             // hSVPretoToolStripMenuItem
             // 
             this.hSVPretoToolStripMenuItem.Name = "hSVPretoToolStripMenuItem";
-            this.hSVPretoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hSVPretoToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.hSVPretoToolStripMenuItem.Text = "HSVPretoBD";
             this.hSVPretoToolStripMenuItem.Click += new System.EventHandler(this.hSVPretoToolStripMenuItem_Click);
             // 
             // qualPecaToolStripMenuItem
             // 
             this.qualPecaToolStripMenuItem.Name = "qualPecaToolStripMenuItem";
-            this.qualPecaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.qualPecaToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.qualPecaToolStripMenuItem.Text = "QualPeca";
             this.qualPecaToolStripMenuItem.Click += new System.EventHandler(this.qualPecaToolStripMenuItem_Click);
             // 
@@ -283,7 +283,7 @@
             // 
             this.panel1.AutoScroll = true;
             this.panel1.Controls.Add(this.coordInferior);
-            this.panel1.Controls.Add(this.coorSuperior);
+            this.panel1.Controls.Add(this.coordSuperior);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.button1);
@@ -296,15 +296,25 @@
             this.panel1.Size = new System.Drawing.Size(1549, 698);
             this.panel1.TabIndex = 6;
             // 
-            // coorSuperior
+            // coordInferior
             // 
-            this.coorSuperior.Enabled = false;
-            this.coorSuperior.Location = new System.Drawing.Point(1438, 91);
-            this.coorSuperior.Name = "coorSuperior";
-            this.coorSuperior.ReadOnly = true;
-            this.coorSuperior.Size = new System.Drawing.Size(100, 20);
-            this.coorSuperior.TabIndex = 13;
-            this.coorSuperior.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.coordInferior.Enabled = false;
+            this.coordInferior.Location = new System.Drawing.Point(1438, 118);
+            this.coordInferior.Name = "coordInferior";
+            this.coordInferior.ReadOnly = true;
+            this.coordInferior.Size = new System.Drawing.Size(100, 20);
+            this.coordInferior.TabIndex = 14;
+            this.coordInferior.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // coordSuperior
+            // 
+            this.coordSuperior.Enabled = false;
+            this.coordSuperior.Location = new System.Drawing.Point(1438, 91);
+            this.coordSuperior.Name = "coordSuperior";
+            this.coordSuperior.ReadOnly = true;
+            this.coordSuperior.Size = new System.Drawing.Size(100, 20);
+            this.coordSuperior.TabIndex = 13;
+            this.coordSuperior.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
             // 
@@ -362,16 +372,6 @@
             this.ImageViewer.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageViewer.TabIndex = 6;
             this.ImageViewer.TabStop = false;
-            // 
-            // coordInferior
-            // 
-            this.coordInferior.Enabled = false;
-            this.coordInferior.Location = new System.Drawing.Point(1438, 118);
-            this.coordInferior.Name = "coordInferior";
-            this.coordInferior.ReadOnly = true;
-            this.coordInferior.Size = new System.Drawing.Size(100, 20);
-            this.coordInferior.TabIndex = 14;
-            this.coordInferior.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // MainForm
             // 
@@ -431,7 +431,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox coorSuperior;
+        public System.Windows.Forms.TextBox coordSuperior;
         private System.Windows.Forms.TextBox coordInferior;
     }
 }
