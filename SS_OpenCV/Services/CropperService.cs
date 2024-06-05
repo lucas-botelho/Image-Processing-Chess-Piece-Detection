@@ -50,6 +50,16 @@ namespace CG_OpenCV.Services
                 int step = m.widthStep;
                 float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
                 float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
+                double angleRodar = 0;                                        // Create a 2D array
+                int[,] mapaBinarização = new int[width, height]; //vamos encher este mapa com 0s e 1s
+                                                                 // Preencher o array com zeros
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        mapaBinarização[i, j] = 0;
+                    }
+                }
                 if (nChan == 3) // image in RGB RedGreenBlue
                 {
 
@@ -64,10 +74,11 @@ namespace CG_OpenCV.Services
 
                             Color original = Color.FromArgb(red, green, blue);
                             ImageClass.ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (70 < hue && hue < 320) //DAR O TUNE AQUI if (150 < hue && hue < 320) 
+                            if (180< hue && hue < 290 && value>0.1) //DAR O TUNE AQUI if (150 < hue && hue < 320) do upper green ao pink 
                             {
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;
+                                mapaBinarização[x, y] = 1;
                                 (dataPtr + x * nChan + y * step)[0] = 0;
                                 (dataPtr + x * nChan + y * step)[1] = 0;
                                 (dataPtr + x * nChan + y * step)[2] = 0;
@@ -81,9 +92,10 @@ namespace CG_OpenCV.Services
                         }
                     }
                     int thresholdPertenceTabuleiro = 3; //Alter threshold de percentagem
+                    
+
                     //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
                     // Initialize min and max values for X and Y
-
                     // Process histogramX and find min and max X where histogramX[x] > 20
                     for (x = 0; x < width; x++)
                     {
@@ -111,8 +123,33 @@ namespace CG_OpenCV.Services
                             maxY = y;
                         }
                     }
+                    var deltaX = Math.Abs(maxX - minX);
+                    var deltaY = Math.Abs(maxY - minY);
+                    int cantoInferiorX=0;
+                    int cantoSuperiorX=0;
+                    if (Math.Abs(deltaX- deltaY) > 10) //o tabuleiro está rodado
+                    {
+                        //ir buscar as coordenadas através do y min e y max, recorrendo ao mapaBinarização
+                        for(x = 0; x < width; x++)
+                        {
+                            if(mapaBinarização[x, minY] == 1)
+                            {
+                                cantoInferiorX = x;
+                            }
+                            if (mapaBinarização[x, maxY] == 1)
+                            {
+                                cantoSuperiorX = x;
+                            }
+                        }
+                        double angle = (Math.Atan((double)Math.Abs(maxY - minY) / (double)Math.Abs(cantoSuperiorX - cantoInferiorX)))* (180 / Math.PI);
+                        angleRodar = angle - 45;
+                    }
+                    
+
+               
                 }
-            }
+                
+           }
 
             //primeira coordenada ponta inferior esquerda 
             //segunda coordenada ponta superior direita
