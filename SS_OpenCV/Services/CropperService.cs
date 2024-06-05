@@ -159,8 +159,9 @@ namespace CG_OpenCV.Services
                 new Coord(maxX,minY),
             };
         }
-        public double FindBoardAngle(Image<Bgr, Byte> imgCopy)
+        public double FindBoardAngle(Image<Bgr, Byte> boardImg)
         {
+            var imgCopy = boardImg.Copy();
             int minX = -1, maxX = -1, minY = -1, maxY = -1;
             double angleRodar = 0;
             unsafe
@@ -200,7 +201,7 @@ namespace CG_OpenCV.Services
 
                             Color original = Color.FromArgb(red, green, blue);
                             ImageClass.ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (180 < hue && hue < 290 && value > 0.1) //DAR O TUNE AQUI if (150 < hue && hue < 320) do upper green ao pink 
+                            if (180 < hue && hue < 230 && value > 0.5) //DAR O TUNE AQUI if (150 < hue && hue < 320) do upper green ao pink 
                             {
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;
@@ -217,7 +218,7 @@ namespace CG_OpenCV.Services
                             }
                         }
                     }
-                    int thresholdPertenceTabuleiro = 3; //Alter threshold de percentagem
+                    int thresholdPertenceTabuleiro = 1; //Alter threshold de percentagem
 
 
                     //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
@@ -279,7 +280,7 @@ namespace CG_OpenCV.Services
 
             //primeira coordenada ponta inferior esquerda 
             //segunda coordenada ponta superior direita
-            return angleRodar;
+            return angleRodar * (float)Math.PI / 180.0f; 
         }
         public Coord[] FindPieceCoord(Image<Bgr, Byte> imgCopy)
         {
@@ -411,14 +412,18 @@ namespace CG_OpenCV.Services
 
         public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior)
         {
-            var angle = FindBoardAngle(boardImg);
+            var boardCopy = boardImg.Copy();
+            var angle = FindBoardAngle(boardCopy);
 
-            if (angle > 3)
+            if (angle > 3 * (float)Math.PI / 180.0f)
             {
-                ImageClass.Rotation(boardImg, boardImg.Copy(), (float) angle);
+                ImageClass.Rotation_Bilinear(boardCopy, boardCopy.Copy(), (float) angle);
+                var relativePath = Path.Combine("..", "..", "dizerTipoPeca/tabuleirorodado.png");
+                var absolutePath = Path.GetFullPath(relativePath);
+                boardCopy.Bitmap.Save(absolutePath, ImageFormat.Png);
             }
-            var boardCopyToWorkOn = boardImg.Copy();
-            var boardCopyToSubRect = boardImg.Copy();
+            var boardCopyToWorkOn = boardCopy.Copy();
+            var boardCopyToSubRect = boardCopy.Copy();
 
             // Encontra as coordenadas do tabuleiro na imagem
             var boardCoords = this.FindBoardCoords(boardCopyToWorkOn);

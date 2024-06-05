@@ -240,7 +240,7 @@ namespace CG_OpenCV
         private void button1_Click(object sender, EventArgs e)
         {
             
-            var casa = comboBox1.SelectedItem.ToString();
+            var casa = comboBox1.SelectedItem?.ToString() ?? null;
             if (string.IsNullOrEmpty(casa) || img == null)
             {
                 MessageBox.Show("Por favor selecione uma casa do tabuleiro.",
