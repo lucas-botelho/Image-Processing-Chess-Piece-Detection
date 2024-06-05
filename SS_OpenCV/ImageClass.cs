@@ -4208,54 +4208,54 @@ namespace CG_OpenCV
 
 
 
-        public static void BinarizeImageWithColorToHsv(Image<Bgr, byte> img)
-        {
-            unsafe
-            {
-                MIplImage m = img.MIplImage;
-                byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
-                byte blue, green, red;
+        //public static void BinarizeImageWithColorToHsv(Image<Bgr, byte> img)
+        //{
+        //    unsafe
+        //    {
+        //        MIplImage m = img.MIplImage;
+        //        byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
+        //        byte blue, green, red;
 
-                int width = img.Width;
-                int height = img.Height;
-                int nChan = m.nChannels; // number of channels - 3
-                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
-                int x, y;
-                int step = m.widthStep;
-                float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
-                float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
-                if (nChan == 3) // image in RGB RedGreenBlue
-                {
-                    for (y = 0; y < height; y++)
-                    {
-                        for (x = 0; x < width; x++)
-                        {
-                            //retrive 3 colour components
-                            blue = (dataPtr + x * nChan + y * step)[0];
-                            green = (dataPtr + x * nChan + y * step)[1];
-                            red = (dataPtr + x * nChan + y * step)[2];
+        //        int width = img.Width;
+        //        int height = img.Height;
+        //        int nChan = m.nChannels; // number of channels - 3
+        //        int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+        //        int x, y;
+        //        int step = m.widthStep;
+        //        float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
+        //        float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
+        //        if (nChan == 3) // image in RGB RedGreenBlue
+        //        {
+        //            for (y = 0; y < height; y++)
+        //            {
+        //                for (x = 0; x < width; x++)
+        //                {
+        //                    //retrive 3 colour components
+        //                    blue = (dataPtr + x * nChan + y * step)[0];
+        //                    green = (dataPtr + x * nChan + y * step)[1];
+        //                    red = (dataPtr + x * nChan + y * step)[2];
 
-                            Color original = Color.FromArgb(red, green, blue);
-                            ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (70 < hue && hue < 320) //DAR O TUNE AQUI
-                            {
-                                histogramY[y] = histogramY[y] + 1;
-                                histogramX[x] = histogramX[x] + 1;
-                                (dataPtr + x * nChan + y * step)[0] = 0;
-                                (dataPtr + x * nChan + y * step)[1] = 0;
-                                (dataPtr + x * nChan + y * step)[2] = 0;
-                            }
-                            else
-                            {
-                                (dataPtr + x * nChan + y * step)[0] = 255;
-                                (dataPtr + x * nChan + y * step)[1] = 255;
-                                (dataPtr + x * nChan + y * step)[2] = 255;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                    Color original = Color.FromArgb(red, green, blue);
+        //                    ColorToHSV(original, out var hue, out var saturation, out var value);
+        //                    if (70 < hue && hue < 320) //DAR O TUNE AQUI
+        //                    {
+        //                        histogramY[y] = histogramY[y] + 1;
+        //                        histogramX[x] = histogramX[x] + 1;
+        //                        (dataPtr + x * nChan + y * step)[0] = 0;
+        //                        (dataPtr + x * nChan + y * step)[1] = 0;
+        //                        (dataPtr + x * nChan + y * step)[2] = 0;
+        //                    }
+        //                    else
+        //                    {
+        //                        (dataPtr + x * nChan + y * step)[0] = 255;
+        //                        (dataPtr + x * nChan + y * step)[1] = 255;
+        //                        (dataPtr + x * nChan + y * step)[2] = 255;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public static void BinarizeImageWithColorToHsvBlack(Image<Bgr, byte> img)
         {
             var bcroper = new CropperService();
@@ -4304,9 +4304,7 @@ namespace CG_OpenCV
             }
         }
 
-
-
-        public static (double, string) CalculateIgualityPercentage(Image<Bgr, byte> imagem, Image<Bgr, byte> imagemBD, string nomeImgBd)
+        public static (double, string) CalculateIgualityDiference(Image<Bgr, byte> imagem, Image<Bgr, byte> imagemBD, string nomeImgBd)
         {
             unsafe
             {
@@ -4380,7 +4378,7 @@ namespace CG_OpenCV
                 //Passo para debug
                 Helper.SaveImagesLocally(figureResized, imgDbResized);
                
-                relacoes[B_D] = CalculateIgualityPercentage(figureResized, imgDbResized, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
+                relacoes[B_D] = CalculateIgualityDiference(figureResized, imgDbResized, Path.GetFileNameWithoutExtension(Base_Dados[B_D])); //percentagens de igualdade
             }
             string path = Base_Dados[Array.IndexOf(relacoes, relacoes.Min())];
             return Path.GetFileNameWithoutExtension(path); //o Nome da peca correspondente

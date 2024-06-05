@@ -64,7 +64,7 @@ namespace CG_OpenCV.Services
 
                             Color original = Color.FromArgb(red, green, blue);
                             ImageClass.ColorToHSV(original, out var hue, out var saturation, out var value);
-                            if (150 < hue && hue < 320) //DAR O TUNE AQUI
+                            if (70 < hue && hue < 320) //DAR O TUNE AQUI if (150 < hue && hue < 320) 
                             {
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;

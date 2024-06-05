@@ -200,7 +200,7 @@ namespace CG_OpenCV
             //copy Undo Image
             imgUndo = img.Copy();
 
-            ImageClass.BinarizeImageWithColorToHsv(img);
+            ImageClass.ConvertToBW_Otsu(img);
 
             ImageViewer.Image = img.Bitmap;
             ImageViewer.Refresh(); // refresh image on the screen
@@ -210,18 +210,18 @@ namespace CG_OpenCV
 
         private void cropTabuleiroToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cropperService = new CropperService();
-            var croppedBoard = cropperService.CropBoardAndSaveImage(img);
-            var imagensCortadinhas = cropperService.CropHouseFromBoard(croppedBoard);
+            //var cropperService = new CropperService();
+            //var croppedBoard = cropperService.CropBoardAndSaveImage(img);
+            //var imagensCortadinhas = cropperService.CropHouseFromBoard(croppedBoard);
         }
 
         private void hSVPretoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string[] pecasBd = Directory.GetFiles(Helper.FolderPath("BD Chess"));
-            Helper.BinarizeAndSaveBDImages(pecasBd);
+            //string[] pecasBd = Directory.GetFiles(Helper.FolderPath("BD Chess"));
+            //Helper.BinarizeAndSaveBDImages(pecasBd);
 
-            string[] pecasCortadinhas = Directory.GetFiles(Helper.FolderPath("ImagensCortadinhas"));
-            Helper.BinarizeAndSaveImages(pecasCortadinhas);
+            //string[] pecasCortadinhas = Directory.GetFiles(Helper.FolderPath("ImagensCortadinhas"));
+            //Helper.BinarizeAndSaveImages(pecasCortadinhas);
         }
 
         private void qualPecaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -231,10 +231,10 @@ namespace CG_OpenCV
             Cursor = Cursors.WaitCursor; // clock cursor 
 
 
-            MessageBox.Show(ImageClass.GetNomePeca(img),
-                           "Success",
-                           MessageBoxButtons.OK,
-                           MessageBoxIcon.Information);
+            //MessageBox.Show(ImageClass.GetNomePeca(img),
+            //               "Success",
+            //               MessageBoxButtons.OK,
+            //               MessageBoxIcon.Information);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -252,7 +252,8 @@ namespace CG_OpenCV
 
             var boardCropper = new CropperService();
             croppedBoard = boardCropper.CropBoard(img, out var cSuperior, out var cInferior);
-            ImageViewer.Image = img.Bitmap;
+            //ImageViewer.Image = croppedBoard.Bitmap;
+            //ImageViewer.Image = img.Bitmap;
 
             //Atualizar coordenadas em pixeis do tabuleiro
             this.coordSuperior.Text = cSuperior.ToString();
