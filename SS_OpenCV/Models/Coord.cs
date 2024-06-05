@@ -14,6 +14,6 @@ namespace CG_OpenCV.Models
             this.Y = y;
         }
         public int X { get; set; }
-        public int Y { get; set; }  
+        public int Y { get; set; }
     }
 }

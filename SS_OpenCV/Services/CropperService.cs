@@ -36,7 +36,7 @@ namespace CG_OpenCV.Services
         public Coord[] FindBoardCoords(Image<Bgr, Byte> imgCopy)
         {
             int minX = -1, maxX = -1, minY = -1, maxY = -1;
-
+            double angleRodar = 0;
             unsafe
             {
                 MIplImage m = imgCopy.MIplImage;
@@ -50,7 +50,7 @@ namespace CG_OpenCV.Services
                 int step = m.widthStep;
                 float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
                 float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
-                double angleRodar = 0;                                        // Create a 2D array
+
                 int[,] mapaBinarização = new int[width, height]; //vamos encher este mapa com 0s e 1s
                                                                  // Preencher o array com zeros
                 for (int i = 0; i < width; i++)
@@ -158,6 +158,128 @@ namespace CG_OpenCV.Services
                 new Coord(minX,maxY),
                 new Coord(maxX,minY),
             };
+        }
+        public double FindBoardAngle(Image<Bgr, Byte> imgCopy)
+        {
+            int minX = -1, maxX = -1, minY = -1, maxY = -1;
+            double angleRodar = 0;
+            unsafe
+            {
+                MIplImage m = imgCopy.MIplImage;
+                byte* dataPtr = (byte*)m.imageData.ToPointer(); // Pointer to the image
+                byte blue, green, red;
+                int width = imgCopy.Width;
+                int height = imgCopy.Height;
+                int nChan = m.nChannels; // number of channels - 3
+                int padding = m.widthStep - m.nChannels * m.width; // alinhament bytes (padding)
+                int x, y;
+                int step = m.widthStep;
+                float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
+                float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
+
+                int[,] mapaBinarização = new int[width, height]; //vamos encher este mapa com 0s e 1s
+                                                                 // Preencher o array com zeros
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        mapaBinarização[i, j] = 0;
+                    }
+                }
+                if (nChan == 3) // image in RGB RedGreenBlue
+                {
+
+                    for (y = 0; y < height; y++)
+                    {
+                        for (x = 0; x < width; x++)
+                        {
+                            //retrive 3 colour components
+                            blue = (dataPtr + x * nChan + y * step)[0];
+                            green = (dataPtr + x * nChan + y * step)[1];
+                            red = (dataPtr + x * nChan + y * step)[2];
+
+                            Color original = Color.FromArgb(red, green, blue);
+                            ImageClass.ColorToHSV(original, out var hue, out var saturation, out var value);
+                            if (180 < hue && hue < 290 && value > 0.1) //DAR O TUNE AQUI if (150 < hue && hue < 320) do upper green ao pink 
+                            {
+                                histogramY[y] = histogramY[y] + 1;
+                                histogramX[x] = histogramX[x] + 1;
+                                mapaBinarização[x, y] = 1;
+                                (dataPtr + x * nChan + y * step)[0] = 0;
+                                (dataPtr + x * nChan + y * step)[1] = 0;
+                                (dataPtr + x * nChan + y * step)[2] = 0;
+                            }
+                            else
+                            {
+                                (dataPtr + x * nChan + y * step)[0] = 255;
+                                (dataPtr + x * nChan + y * step)[1] = 255;
+                                (dataPtr + x * nChan + y * step)[2] = 255;
+                            }
+                        }
+                    }
+                    int thresholdPertenceTabuleiro = 3; //Alter threshold de percentagem
+
+
+                    //Place the values by percentage on the histograms and see if they are the xo,yo or x1,y1 of the board.
+                    // Initialize min and max values for X and Y
+                    // Process histogramX and find min and max X where histogramX[x] > 20
+                    for (x = 0; x < width; x++)
+                    {
+                        histogramX[x] = (histogramX[x] / height) * 100;
+                        if (histogramX[x] > thresholdPertenceTabuleiro)
+                        {
+                            if (minX == -1)
+                            {
+                                minX = x;
+                            }
+                            maxX = x;
+                        }
+                    }
+
+                    // Process histogramY and find min and max Y where histogramY[y] > 20
+                    for (y = 0; y < height; y++)
+                    {
+                        histogramY[y] = (histogramY[y] / width) * 100;
+                        if (histogramY[y] > thresholdPertenceTabuleiro)
+                        {
+                            if (minY == -1)
+                            {
+                                minY = y;
+                            }
+                            maxY = y;
+                        }
+                    }
+                    var deltaX = Math.Abs(maxX - minX);
+                    var deltaY = Math.Abs(maxY - minY);
+                    int cantoInferiorX = 0;
+                    int cantoSuperiorX = 0;
+                    if (Math.Abs(deltaX - deltaY) > 10) //o tabuleiro está rodado
+                    {
+                        //ir buscar as coordenadas através do y min e y max, recorrendo ao mapaBinarização
+                        for (x = 0; x < width; x++)
+                        {
+                            if (mapaBinarização[x, minY] == 1)
+                            {
+                                cantoInferiorX = x;
+                            }
+                            if (mapaBinarização[x, maxY] == 1)
+                            {
+                                cantoSuperiorX = x;
+                            }
+                        }
+                        double angle = (Math.Atan((double)Math.Abs(maxY - minY) / (double)Math.Abs(cantoSuperiorX - cantoInferiorX))) * (180 / Math.PI);
+                        angleRodar = angle - 45;
+                    }
+
+
+
+                }
+
+            }
+
+            //primeira coordenada ponta inferior esquerda 
+            //segunda coordenada ponta superior direita
+            return angleRodar;
         }
         public Coord[] FindPieceCoord(Image<Bgr, Byte> imgCopy)
         {
@@ -277,7 +399,6 @@ namespace CG_OpenCV.Services
             //[0] x min e x max
             //[1] y min e y max
             var coords = this.FindPieceCoord(houseImg.Copy());
-
             int width = Math.Abs(coords[0].X - coords[0].Y);
             int height = Math.Abs(coords[1].X - coords[1].Y);
 
@@ -290,8 +411,15 @@ namespace CG_OpenCV.Services
 
         public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior)
         {
+            var angle = FindBoardAngle(boardImg);
+
+            if (angle > 3)
+            {
+                ImageClass.Rotation(boardImg, boardImg.Copy(), (float) angle);
+            }
             var boardCopyToWorkOn = boardImg.Copy();
             var boardCopyToSubRect = boardImg.Copy();
+
             // Encontra as coordenadas do tabuleiro na imagem
             var boardCoords = this.FindBoardCoords(boardCopyToWorkOn);
 
