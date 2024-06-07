@@ -285,6 +285,7 @@ namespace CG_OpenCV.Services
         public Coord[] FindPieceCoord(Image<Bgr, Byte> imgCopy)
         {
             int minX = -1, maxX = -1, minY = -1, maxY = -1;
+            double percentagemPixeisPretos = 0;
 
             unsafe
             {
@@ -299,6 +300,7 @@ namespace CG_OpenCV.Services
                 int step = m.widthStep;
                 float[] histogramX = new float[width]; //holds the percentage of 255 on that X column
                 float[] histogramY = new float[height]; //holds the percentage of 255 of that Y line
+                int numeroPixeisPretos = 0;
                 if (nChan == 3) // image in RGB RedGreenBlue
                 {
 
@@ -311,9 +313,9 @@ namespace CG_OpenCV.Services
                             green = (dataPtr + x * nChan + y * step)[1];
                             red = (dataPtr + x * nChan + y * step)[2];
                             var ePreto = blue == 0 && green == 0 && red == 0;
-
                             if (ePreto) //DAR O TUNE AQUI
                             {
+                                numeroPixeisPretos++;
                                 histogramY[y] = histogramY[y] + 1;
                                 histogramX[x] = histogramX[x] + 1;
                             } 
@@ -350,16 +352,18 @@ namespace CG_OpenCV.Services
                             maxY = y;
                         }
                     }
+                    percentagemPixeisPretos = ((float)numeroPixeisPretos / (width * height))*100;
                 }
             }
 
-            //primeira coordenada ponta inferior esquerda 
-            //segunda coordenada ponta superior direita
-            return new Coord[2]
-            {
-                new Coord(minX,maxX),
-                new Coord(minY,maxY),
-            };
+
+            return percentagemPixeisPretos < 1 ?
+                null :
+                new Coord[2]
+                {
+                    new Coord(minX,maxX),
+                    new Coord(minY,maxY),
+                };
         }
 
         public IEnumerable<Image<Bgr, Byte>> CropHouseFromBoard(Image<Bgr, Byte> croppedBoard)
@@ -400,6 +404,9 @@ namespace CG_OpenCV.Services
             //[0] x min e x max
             //[1] y min e y max
             var coords = this.FindPieceCoord(houseImg.Copy());
+
+            if (coords == null) return null;
+
             int width = Math.Abs(coords[0].X - coords[0].Y);
             int height = Math.Abs(coords[1].X - coords[1].Y);
 
@@ -410,18 +417,16 @@ namespace CG_OpenCV.Services
 
 
 
-        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior, out bool wasRotated)
+        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior)
         {
             var boardCopy = boardImg.Copy();
             var angle = FindBoardAngle(boardCopy);
-            wasRotated = false;
             if (angle > 3 * (float)Math.PI / 180.0f)
             {
                 ImageClass.Rotation_BilinearParaBranco(boardCopy, boardCopy.Copy(), (float) angle);
                 var relativePath = Path.Combine("..", "..", "dizerTipoPeca/tabuleirorodado.png");
                 var absolutePath = Path.GetFullPath(relativePath);
                 boardCopy.Bitmap.Save(absolutePath, ImageFormat.Png);
-                wasRotated = true;
             }
             var boardCopyToWorkOn = boardCopy.Copy();
             var boardCopyToSubRect = boardCopy.Copy();

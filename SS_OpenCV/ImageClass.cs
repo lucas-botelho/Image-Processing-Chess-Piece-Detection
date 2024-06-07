@@ -4378,6 +4378,8 @@ namespace CG_OpenCV
                 int pixelOriginal = 0;
                 int pixelBD = 0;
                 int diferenca = 0;
+                int numeroPixeisPretos = 0;
+
                 if (nChan == 3) // image in RGB
                 {
                     for (y = 0; y < height; y++)
@@ -4395,12 +4397,19 @@ namespace CG_OpenCV
                             var redBD = (byte)(int)Math.Round((double)(dataPtrImagemBD + nChan * x + step * y)[2]);
 
                             pixelOriginal = (blue == 0 && green == 0 && red == 0) ? 1 : 0;
+                            numeroPixeisPretos = (blue == 0 && green == 0 && red == 0) ? numeroPixeisPretos + 1 : numeroPixeisPretos + 0; //incrementar o numero de pixeis pretos
+
                             pixelBD = (blueBD == 0 && greenBD == 0 && redBD == 0) ? 1 : 0;
                             diferenca += Math.Abs(pixelOriginal - pixelBD);
                         }
                     }
                 }
-                return (diferenca, nomeImgBd);
+
+                double percentagemPixeisPretos = ((float)numeroPixeisPretos / (width * height))*100;
+
+                return percentagemPixeisPretos > 1 ?
+                    (diferenca, nomeImgBd):
+                    (diferenca, "casaVazia"); 
             }
         }
 

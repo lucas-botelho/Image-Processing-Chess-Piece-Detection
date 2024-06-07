@@ -251,12 +251,7 @@ namespace CG_OpenCV
             }
 
             var boardCropper = new CropperService();
-            croppedBoard = boardCropper.CropBoard(img, out var cSuperior, out var cInferior, out var wasRotated);
-           
-            if (wasRotated)
-            {
-                croppedBoard = boardCropper.CropBoard(croppedBoard.Copy(), out cSuperior, out cInferior, out wasRotated); 
-            }
+            croppedBoard = boardCropper.CropBoard(img, out var cSuperior, out var cInferior);
 
             //ImageViewer.Image = croppedBoard.Bitmap;
             //ImageViewer.Image = img.Bitmap;
@@ -286,6 +281,16 @@ namespace CG_OpenCV
             }
 
             var pieceFigure = boardCropper.CropFigure(croppedHouse);
+
+            if (pieceFigure == null)
+            {
+                MessageBox.Show("Casa vazia!",
+                          "Warning",
+                          MessageBoxButtons.OK,
+                          MessageBoxIcon.Warning);
+                return;
+            }
+
             relativePath = Path.Combine("..", "..", $"dizerTipoPeca/croppedFigure.png");
             absolutePath = Path.GetFullPath(relativePath);
             pieceFigure.Bitmap.Save(absolutePath, ImageFormat.Png);
