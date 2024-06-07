@@ -435,7 +435,7 @@ namespace CG_OpenCV.Services
             int boardHeight = Math.Abs(boardCoords[0].Y - boardCoords[1].Y);
 
             coordSuperior = $"({boardCoords[1].X},{boardCoords[1].Y})";
-            coordInferior = $"({boardCoords[1].X},{boardCoords[1].Y})";
+            coordInferior = $"({boardCoords[0].X},{boardCoords[0].Y})";
 
             // Retorna a subimagem do tabuleiro recortado
             return boardCopyToSubRect.GetSubRect(new Rectangle(boardCoords[0].X, boardCoords[1].Y, boardWidth, boardHeight));
