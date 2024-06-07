@@ -3997,6 +3997,54 @@ namespace CG_OpenCV
 
             }
         }
+        
+        public static void Rotation_BilinearParaBranco(Image<Bgr, byte> img, Image<Bgr, byte> imgCopy, float angle)
+        {
+            unsafe
+            {
+                //obter apontador do inicio da imagem
+                MIplImage m = img.MIplImage;//imagem de destino
+                MIplImage mUndo = imgCopy.MIplImage;//imagem original
+
+                byte* dataPtrRead = (byte*)mUndo.imageData.ToPointer();//Pointer to the original image
+                byte* dataPtrWrite = (byte*)m.imageData.ToPointer();//Pointer to the destiny image
+
+                int width = imgCopy.Width;
+                int height = imgCopy.Height;
+                int nChan = mUndo.nChannels;
+                int widthStep = mUndo.widthStep;
+                byte red, green, blue;
+                int x0, y0;
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        x0 = (int)Math.Round((x - (width / 2.0)) * Math.Cos(angle) - ((height / 2.0) - y) * Math.Sin(angle) + (width / 2.0));
+                        y0 = (int)Math.Round((height / 2.0) - (x - (width / 2.0)) * Math.Sin(angle) - ((height / 2.0) - y) * Math.Cos(angle));
+
+                        if (x0 >= 0 && x0 < width && y0 >= 0 && y0 < height)
+                        {
+                            blue = (dataPtrRead + nChan * x0 + widthStep * y0)[0];
+                            green = (dataPtrRead + nChan * x0 + widthStep * y0)[1];
+                            red = (dataPtrRead + nChan * x0 + widthStep * y0)[2];
+
+                        }
+                        else
+                        {
+                            blue = green = red = 255;
+                        }
+
+                        (dataPtrWrite + nChan * x + widthStep * y)[0] = blue;
+                        (dataPtrWrite + nChan * x + widthStep * y)[1] = green;
+                        (dataPtrWrite + nChan * x + widthStep * y)[2] = red;
+
+                    }
+
+                }
+
+            }
+        }
 
         // Scale_Bilinear Facultrativo
         public static void Scale_Bilinear(Image<Bgr, byte> img, Image<Bgr, byte> imgCopy, float scaleFactor)

@@ -410,17 +410,18 @@ namespace CG_OpenCV.Services
 
 
 
-        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior)
+        public Image<Bgr, Byte> CropBoard(Image<Bgr, Byte> boardImg, out string coordSuperior, out string coordInferior, out bool wasRotated)
         {
             var boardCopy = boardImg.Copy();
             var angle = FindBoardAngle(boardCopy);
-
+            wasRotated = false;
             if (angle > 3 * (float)Math.PI / 180.0f)
             {
-                ImageClass.Rotation_Bilinear(boardCopy, boardCopy.Copy(), (float) angle);
+                ImageClass.Rotation_BilinearParaBranco(boardCopy, boardCopy.Copy(), (float) angle);
                 var relativePath = Path.Combine("..", "..", "dizerTipoPeca/tabuleirorodado.png");
                 var absolutePath = Path.GetFullPath(relativePath);
                 boardCopy.Bitmap.Save(absolutePath, ImageFormat.Png);
+                wasRotated = true;
             }
             var boardCopyToWorkOn = boardCopy.Copy();
             var boardCopyToSubRect = boardCopy.Copy();
@@ -471,7 +472,7 @@ namespace CG_OpenCV.Services
                     // Verifica se a casa atual corresponde à casa especificada (boardHouse)
                     if (boardHouse.Equals($"{letter}{number}"))
                         // Retorna a subimagem correspondente à casa encontrada
-                        return croppedBoard.GetSubRect(new Rectangle(x, y, houseWidth, houseHeight));
+                        return croppedBoard.GetSubRect(new Rectangle(x + (int)(houseWidth * 0.05), y +(int)(houseHeight * 0.05), houseWidth - (int)(houseWidth * 0.05), houseHeight - (int)(houseHeight * 0.05)));
 
                     // Incrementa o número para a próxima coluna
                     number++;
