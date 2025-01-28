@@ -1,22 +1,18 @@
-# **CG_OpenCV_2024**
+# **Image-Processing-vs-OpenCV**
 
-A group project aimed at experimenting with **image processing** techniques and comparing the results using the **OpenCV** library. The project explores various image manipulation algorithms and applies them to real-world images to evaluate OpenCV's capabilities and performance.
+A group project aimed at experimenting with **image processing** techniques. The primary goal of the project was to develop an algorithm capable of detecting **chess pieces** in images. The project explores various image manipulation algorithms and applies them to real-world images.
 
 ## **Features**
-- Implements a range of image processing techniques such as:
-  - Image filtering (e.g., Gaussian blur, edge detection).
-  - Image transformations (e.g., rotation, scaling, translation).
-  - Color space transformations (e.g., RGB to grayscale).
-- Compares results of custom image processing algorithms with OpenCV's built-in functions.
-- Provides a visual interface to view and interact with processed images.
+- Detects chess pieces in images by analyzing the chessboard.
+- Select a chessboard square, and the algorithm identifies which chess piece is there.
 
 ## **Purpose**
-- Gain hands-on experience in **image processing** and **computer vision**.
-- Understand the core functionalities of the **OpenCV** library and its performance.
+- Gain hands-on experience in **image processing**.
+- Build an algorithm to detect chess pieces by processing images of chessboards.
 - Experiment with different image processing techniques and compare their effectiveness.
 - Collaborate as a group to explore various methods and share results.
 
 ## **Project Goals**
-Explore and experiment with different image processing techniques.
-Evaluate the performance and results of OpenCV’s built-in functions compared to custom algorithms.
-Gain practical experience in computer vision and image manipulation tasks.
+- Explore and experiment with different image processing techniques.
+- Develop an algorithm to detect chess pieces based on image analysis.
+- Gain practical experience in computer vision and image manipulation tasks.
