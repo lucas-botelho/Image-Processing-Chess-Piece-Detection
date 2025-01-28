@@ -1,4 +1,4 @@
-# **Image-Processing-vs-OpenCV**
+# **Image Processing Chess Piece Detection**
 
 A group project aimed at experimenting with **image processing** techniques. The primary goal of the project was to develop an algorithm capable of detecting **chess pieces** in images. The project explores various image manipulation algorithms and applies them to real-world images.
 
